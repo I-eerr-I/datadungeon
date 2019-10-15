@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public int   level;
+    public int   level = 10;
+    public int   levelPoints;
     public int   depthOfVision;
     public int   maxHealth;
     public float luck;

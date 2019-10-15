@@ -43,7 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b9e8b2bccc61f44780adcd718bcfd1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  level: 1
+  level: 10
+  levelPoints: 0
   depthOfVision: 2
   maxHealth: 5
   luck: 0.2
