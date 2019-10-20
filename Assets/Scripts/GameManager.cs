@@ -9,9 +9,11 @@ using Random=UnityEngine.Random;
 public class GameManager : MonoBehaviour
 {
     public GameObject player;
+    public UIManager  uiManager;
+
+    public IDbConnection dbConnection;
 
     string           connection_string;
-    IDbConnection    db_connection;
     IDbCommand       command;
     PlayerController player_controller;
 
@@ -33,8 +35,8 @@ public class GameManager : MonoBehaviour
     blocked TINYINT NOT NULL DEFAULT 0)"; 
     const string   KEYS_TABLE          = @"
     (id INTEGER PRIMARY KEY,
-    room_id INTEGER,
-    FOREIGN KEY(room_id) REFERENCES " + ROOM_TABLENAME + "(id))";
+    room_name VARCHAR(45),
+    FOREIGN KEY(room_name) REFERENCES " + ROOM_TABLENAME + "(name) ON DELETE CASCADE)";
     const string   MONSTERS_TABLE      = @"
     (id INTEGER PRIMARY KEY,
     max_secrete INTEGER NOT NULL,
@@ -97,13 +99,28 @@ public class GameManager : MonoBehaviour
     const string   BUG_TYPENAME     = "bug";
     string[]       ITEMS            = {WORM_TYPENAME, TROJAN_TYPENAME, BUG_TYPENAME};
 
-    void Start()
+    void Awake()
     {
         player            = Instantiate(player, player.transform.position, Quaternion.identity);
         player_controller = player.GetComponent<PlayerController>();
+        uiManager.GetComponent<UIManager>().SetPlayerController(player_controller);
         OpenConnection();
-        command = db_connection.CreateCommand();
+        command = dbConnection.CreateCommand();
+        SaveAndLoad();
         GenerateMaze();
+    }
+
+    void SaveAndLoad()
+    {
+        SaveData data = SaveSystem.Load();
+        if(data == null) 
+        {
+            player_controller.SetStartCharacteristics();
+        }
+        else
+        {
+            player_controller.SetCharacteristics(data);
+        }
     }
 
     void GenerateMaze() 
@@ -119,8 +136,8 @@ public class GameManager : MonoBehaviour
     void OpenConnection()
     {
         connection_string = "URI=file:" + Application.persistentDataPath + "/" + MAZE_NAME;
-        db_connection = new SqliteConnection(connection_string);
-        db_connection.Open();
+        dbConnection = new SqliteConnection(connection_string);
+        dbConnection.Open();
     }
 
     void ReinitAllTables()
@@ -252,20 +269,16 @@ public class GameManager : MonoBehaviour
                 blocked_room = Random.Range(1, rooms_amount-1);
                 if(!blocked_rooms.Contains(blocked_room)) found_not_blocked = true;
             }
-            command.CommandText = "SELECT id FROM " + ROOMS_TABLENAME + " WHERE name = '" + rooms[blocked_room] + "'";
-            IDataReader reader  = command.ExecuteReader();
-            reader.Read();
-            int room_id = reader.GetInt32(0);
-            reader.Close();
-            command.CommandText = "INSERT INTO " + KEYS_TABLENAME + "(id, room_id) VALUES("+ key_id.ToString() + ", " + room_id.ToString() +")";
+            command.CommandText = "INSERT INTO " + KEYS_TABLENAME + "(id, room_name) VALUES("+ key_id.ToString() + ", '" + rooms[blocked_room] +"')";
             command.ExecuteNonQuery();
-            command.CommandText = "UPDATE " + ROOMS_TABLENAME + " SET blocked = 1 WHERE name = '" + rooms[room_id] + "'";
+            command.CommandText = "UPDATE " + ROOMS_TABLENAME + " SET blocked = 1 WHERE name = '" + rooms[blocked_room] + "'";
             command.ExecuteNonQuery();
-            string key_keeper = rooms[Random.Range(0, room_id-2)];  
-            string key_name   = "key for " + rooms[room_id];
+            string key_keeper = rooms[Random.Range(0, blocked_room-2)];  
+            string key_name   = "key for " + rooms[blocked_room];
             command.CommandText = "INSERT INTO " + key_keeper + "(name, type, key_id) VALUES('" + key_name + "', '" + KEY_TYPENAME + "', " + key_id.ToString() + ")";   
             command.ExecuteNonQuery();
             key_id++;
+            blocked_rooms.Add(blocked_room);
         }
     }
 
