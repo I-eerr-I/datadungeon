@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEditor;
 
 public class UIManager : MonoBehaviour
-{
-    [Header("SQL Part")]
-    public Text terminal;
-    
+{   
     [Header("Inventory")]
     public Text   keysAmount;
     public Text   bugsAmount;
@@ -37,9 +35,20 @@ public class UIManager : MonoBehaviour
     public enum GameState {InMaze, InRoom, InFight};
     public GameState currentState;
     GameState savedState;
+    
+    // public const string REQUEST_MONSTERID = "monster_id";
+    // public const string REQUEST_ROOMNAME  = "room_name";
+    // public const string REQUEST_SECRETE   = "secrete";
+    // public const string REQUEST_ITEMTYPE  = "item_type";
+    // public const string REQUEST_KEYID     = "key_id"; 
 
-    PlayerController player_controller;
-    GameManager      gameManager;
+    Text input;
+    CommandController lastPressed;
+    string            lastRequest;
+
+    PlayerController   player_controller;
+    GameManager        gameManager;
+    TerminalController terminal;
 
     int    maxAmountOfCommands;
     bool   updateVisual;
@@ -48,17 +57,70 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         gameManager         = GameObject.FindWithTag("GameController").GetComponent<GameManager>();
+        terminal            = GameObject.FindWithTag("Terminal").GetComponent<TerminalController>();
         currentState        = GameState.InMaze;
         inputField.enabled  = false;
+        input               = inputField.GetComponentInChildren<Text>();
         updateVisual        = true;
         currentRoom         = null;
         savedState          = currentState;
+        lastRequest         = "";
+        lastPressed         = null;
         maxAmountOfCommands = Mathf.Max(inMazeCommands.Length, inRoomCommands.Length, inFightCommands.Length); 
+    }
+
+    void Update()
+    {
+        if(Input.GetButtonDown("Cancel"))
+        {
+            input.text  = "...|";
+            lastPressed = null;
+            lastRequest = "";
+        }
+        if(Input.GetButtonDown("Enter"))
+        {
+            if(lastPressed != null)
+            {
+                switch(lastPressed.commandType)
+                {
+                    case CommandController.CommandType.EnterTheRoom:
+                    EnterTheRoom();
+                    break;
+                }
+            }
+            lastPressed = null;
+            lastRequest = "";
+        }
+
+        UpdateInventory();
+        UpdateHealth();
+        UpdateCharacteristics();
+        CheckAndSetUpdates();
+        if(updateVisual) UpdateVisual();
+    }
+
+    public void EnterTheRoom()
+    {
+        if(!gameManager.IsTheRoomLocked(currentRoom))
+        {
+            currentState = GameState.InRoom;
+            player_controller.AddRoomForVision(currentRoom);
+            terminal.ShowRoom(currentRoom);
+        }
+        else
+        {
+            terminal.ShowNewText("<color=#ff7777>[ERROR] THE ROOM IS LOCKED. NEED KEY</color>");
+        }
     }
 
     public string GetCurrentRoom()
     {
         return currentRoom;
+    }
+
+    public void SetRoomName(string name)
+    {
+        currentRoom = name;
     }
     
     public void SetPlayerController(PlayerController player_controller)
@@ -66,13 +128,20 @@ public class UIManager : MonoBehaviour
         this.player_controller = player_controller;
     }
 
-    public void Update()
+    public void SetLastCommand(CommandController lastPressed)
     {
-        UpdateInventory();
-        UpdateHealth();
-        UpdateCharacteristics();
-        CheckAndSetUpdates();
-        if(updateVisual) UpdateVisual();
+        this.lastPressed = lastPressed;
+        this.lastRequest = lastPressed.requestFor;
+    }
+
+    public string GetLastRequest()
+    {
+        return lastRequest;
+    }
+
+    public CommandController GetLastPressed()
+    {
+        return lastPressed;
     }
 
     void CheckAndSetUpdates()
@@ -109,13 +178,10 @@ public class UIManager : MonoBehaviour
         {
             Destroy(initedCommand.gameObject);
         }
-        for(int i = 0; i < commandsList.Length; i++)
+        foreach(GameObject command in commandsList)
         {
-            GameObject instantiatedCommand = Instantiate(commandsList[i]);
-            instantiatedCommand.transform.SetParent(commands.transform, false);
-            RectTransform transformCommand = instantiatedCommand.GetComponent<RectTransform>();
-            transformCommand.anchorMin = new Vector2(0, (maxAmountOfCommands-i-1)/(float)maxAmountOfCommands);
-            transformCommand.anchorMax = new Vector2(1, (maxAmountOfCommands-i)/(float)maxAmountOfCommands);
+            GameObject instantiatedCommand = Instantiate(command);
+            instantiatedCommand.transform.SetParent(commands.transform);
         }
     }
 

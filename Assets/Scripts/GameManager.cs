@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 {
     public GameObject player;
     public UIManager  uiManager;
+    public TerminalController terminal;
 
     public IDbConnection dbConnection;
 
@@ -68,7 +69,6 @@ public class GameManager : MonoBehaviour
     const int         MAX_ROOMS_AMOUNT = 4;
     const string      DOOR_TYPENAME    = "door";
     const string      KEY_TYPENAME     = "key";
-    const string      BACKDOOR_NAME    = "Back Door";
     const string      EXITDOOR_NAME    = "Exit";
 
     // Monsters parameters
@@ -103,11 +103,24 @@ public class GameManager : MonoBehaviour
     {
         player            = Instantiate(player, player.transform.position, Quaternion.identity);
         player_controller = player.GetComponent<PlayerController>();
-        uiManager.GetComponent<UIManager>().SetPlayerController(player_controller);
+        uiManager.SetPlayerController(player_controller);
+        terminal.SetPlayerController(player_controller);
         OpenConnection();
         command = dbConnection.CreateCommand();
         SaveAndLoad();
         GenerateMaze();
+    }
+
+    public bool IsTheRoomLocked(string roomName)
+    {
+        command.CommandText = "SELECT blocked FROM rooms WHERE name = '"+roomName+"'";
+        IDataReader reader  = command.ExecuteReader();
+        int blocked = 0;
+        if(reader.Read())
+        {
+            blocked = reader.GetInt32(0);
+        }
+        return (blocked == 1)? true : false; 
     }
 
     void SaveAndLoad()
@@ -139,6 +152,7 @@ public class GameManager : MonoBehaviour
         dbConnection = new SqliteConnection(connection_string);
         dbConnection.Open();
     }
+
 
     void ReinitAllTables()
     {
@@ -293,8 +307,6 @@ public class GameManager : MonoBehaviour
         command.CommandText = "CREATE TABLE " + room_name + ROOM_TABLE;
         command.ExecuteNonQuery();
         command.CommandText = "INSERT INTO " + ROOMS_TABLENAME + "(name) VALUES('" + room_name + "')";
-        command.ExecuteNonQuery();
-        command.CommandText = "INSERT INTO " + room_name + "(name, type) VALUES ('"+BACKDOOR_NAME+"', '"+DOOR_TYPENAME+"')";
         command.ExecuteNonQuery();
     }
 

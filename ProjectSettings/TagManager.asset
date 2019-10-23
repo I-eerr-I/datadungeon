@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Input
   - UIManager
+  - Text
+  - Terminal
   layers:
   - Default
   - TransparentFX

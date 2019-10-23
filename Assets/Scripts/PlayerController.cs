@@ -36,10 +36,15 @@ public class PlayerController : MonoBehaviour
     int   maxHealthUpgrade     = 1;
     float luckUpgrade          = 0.1f;
 
+    int amountOfVisiableRooms;
+
+    Dictionary<string, int> visionForRoom = new Dictionary<string, int>();
+
     IDbCommand command;
 
     void Start()
     {
+        amountOfVisiableRooms = depthOfVision;
         command = GameObject.FindWithTag("GameController").GetComponent<GameManager>().dbConnection.CreateCommand();
         command.CommandText = "INSERT INTO inventory(trojan, worm, bug) VALUES("+trojansAmount.ToString()+","+wormsAmount.ToString()+","+bugsAmount.ToString()+")";
         command.ExecuteNonQuery();
@@ -69,5 +74,31 @@ public class PlayerController : MonoBehaviour
         this.depthOfVision = data.depthOfVision;
         this.maxHealth     = data.maxHealth;
         this.luck          = data.luck;
+    }
+
+    public void AddRoomForVision(string roomName)
+    {
+        if(!visionForRoom.ContainsKey(roomName))
+            visionForRoom.Add(roomName, depthOfVision);
+    }
+
+    public void IncrementVisiableRooms()
+    {
+        amountOfVisiableRooms++;
+    }
+
+    public void IncrementVisionForRoom(string roomName)
+    {
+        visionForRoom[roomName]++;
+    }
+
+    public int GetVisionForRoom(string roomName)
+    {
+        return visionForRoom[roomName];
+    }
+
+    public int GetVisiableRooms()
+    {
+        return amountOfVisiableRooms;
     }
 }
