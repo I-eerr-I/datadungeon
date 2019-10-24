@@ -36,11 +36,11 @@ public class UIManager : MonoBehaviour
     public GameState currentState;
     GameState savedState;
     
-    // public const string REQUEST_MONSTERID = "monster_id";
-    // public const string REQUEST_ROOMNAME  = "room_name";
-    // public const string REQUEST_SECRETE   = "secrete";
-    // public const string REQUEST_ITEMTYPE  = "item_type";
-    // public const string REQUEST_KEYID     = "key_id"; 
+    public const string REQUEST_MONSTERID = "monster_id";
+    public const string REQUEST_ROOMNAME  = "room_name";
+    public const string REQUEST_SECRETE   = "secrete";
+    public const string REQUEST_ITEMTYPE  = "item_type";
+    public const string REQUEST_KEYID     = "key_id"; 
 
     Text input;
     CommandController lastPressed;
@@ -73,7 +73,7 @@ public class UIManager : MonoBehaviour
     {
         if(Input.GetButtonDown("Cancel"))
         {
-            input.text  = "...|";
+            input.text  = "...";
             lastPressed = null;
             lastRequest = "";
         }
@@ -85,6 +85,18 @@ public class UIManager : MonoBehaviour
                 {
                     case CommandController.CommandType.EnterTheRoom:
                     EnterTheRoom();
+                    break;
+
+                    case CommandController.CommandType.ExitRoom:
+                    ExitRoom();
+                    break;
+
+                    case CommandController.CommandType.Attack:
+                    Attack();
+                    break;
+
+                    case CommandController.CommandType.RunAway:
+                    RunAway();
                     break;
                 }
             }
@@ -104,13 +116,39 @@ public class UIManager : MonoBehaviour
         if(!gameManager.IsTheRoomLocked(currentRoom))
         {
             currentState = GameState.InRoom;
+            terminal.ShowNewTextLoading("You're openning the " + currentRoom);
             player_controller.AddRoomForVision(currentRoom);
-            terminal.ShowRoom(currentRoom);
+            terminal.ShowRoomLoading(currentRoom);
         }
         else
         {
             terminal.ShowNewText("<color=#ff7777>[ERROR] THE ROOM IS LOCKED. NEED KEY</color>");
+            currentRoom = "";
         }
+    }
+
+    public void ExitRoom()
+    {
+        currentState = GameState.InMaze;
+        terminal.ShowNewText("You're leaving the " + currentRoom);
+        currentRoom = "";
+        terminal.ShowNewTextLoading("Getting rooms list...\n");
+        terminal.ShowRoomsLoading();
+    }
+
+    public void Attack()
+    {
+        currentState = GameState.InFight;
+        terminal.ShowNewTextLoading("Started monster destroying process.\n");
+    }
+
+    public void RunAway()
+    {
+        currentState = GameState.InRoom;
+        terminal.ShowNewTextLoading("Running away from monster...");
+        terminal.ShowNewText("It's okay. You just need to prepare...\n");
+        terminal.ShowNewTextLoading("");
+        terminal.ShowRoomLoading(currentRoom);
     }
 
     public string GetCurrentRoom()

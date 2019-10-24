@@ -120,6 +120,7 @@ public class GameManager : MonoBehaviour
         {
             blocked = reader.GetInt32(0);
         }
+        reader.Close();
         return (blocked == 1)? true : false; 
     }
 

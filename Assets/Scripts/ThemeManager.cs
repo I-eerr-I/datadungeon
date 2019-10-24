@@ -44,19 +44,19 @@ public class ThemeManager : MonoBehaviour
 
     void Update()
     {
-        if(uiManager.currentState == UIManager.GameState.InFight)
-        {
-            isAttack = true;
-            savedColor = color;
-            AssignColor(bgRed);
-            ChangeTextColor(txtRed);
-        }
-        else
-        {
-            isAttack = false;
-            AssignColor(savedColor);
-            ChangeTextColor(currentTextColor);
-        }
+        // if(uiManager.currentState == UIManager.GameState.InFight)
+        // {
+        //     isAttack = true;
+        //     savedColor = color;
+        //     AssignColor(bgRed);
+        //     ChangeTextColor(txtRed);
+        // }
+        // else
+        // {
+        //     isAttack = false;
+        //     AssignColor(savedColor);
+        //     ChangeTextColor(currentTextColor);
+        // }
 
         if(!isAttack)
         {

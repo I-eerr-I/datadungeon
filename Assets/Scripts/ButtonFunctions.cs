@@ -26,17 +26,17 @@ public class ButtonFunctions : MonoBehaviour
 
     public void GiveRoomName()
     {
-        if(uiManager.GetLastRequest().Equals("room_name"))
+        if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_ROOMNAME))
         {
             string roomName = GetComponentInChildren<Text>().text;
             uiManager.GetLastPressed().TakeRequest(roomName);
-            uiManager.SetRoomName(roomName);
+            uiManager.SetRoomName(roomName); 
         }
     }
 
     public void GiveMonsterID()
     {
-        if(uiManager.GetLastRequest().Equals("monster_id"))
+        if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_MONSTERID))
         {
             foreach(Transform column in transform)
             {

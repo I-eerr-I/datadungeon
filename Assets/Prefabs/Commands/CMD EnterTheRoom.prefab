@@ -174,8 +174,8 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.07058824, g: 0.18823531, b: 0.08235294, a: 1}
-    m_HighlightedColor: {r: 0.21698111, g: 0.3137255, b: 0.21698111, a: 1}
+    m_NormalColor: {r: 0.07058824, g: 0.18823531, b: 0.08235294, a: 0.5019608}
+    m_HighlightedColor: {r: 0.21698111, g: 0.3137255, b: 0.21698111, a: 0.5019608}
     m_PressedColor: {r: 0.34474012, g: 0.5754717, b: 0.34474012, a: 1}
     m_SelectedColor: {r: 0.015218934, g: 0.16981131, b: 0.031491827, a: 1}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
@@ -225,6 +225,7 @@ MonoBehaviour:
   fontSize: 14
   useRoomNameFormat: 0
   requestFor: room_name
+  commandType: 0
 --- !u!114 &3799301712452932523
 MonoBehaviour:
   m_ObjectHideFlags: 0
