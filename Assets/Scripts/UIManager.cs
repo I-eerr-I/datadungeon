@@ -122,7 +122,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            terminal.ShowNewText("<color=#ff7777>[ERROR] THE ROOM IS LOCKED. NEED KEY</color>");
+            terminal.ShowNewTextLoading("<color=#ff7777>[ERROR] THE ROOM IS LOCKED. NEED KEY</color>");
             currentRoom = "";
         }
     }
