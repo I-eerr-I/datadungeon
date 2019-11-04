@@ -38,16 +38,29 @@ public class PlayerController : MonoBehaviour
 
     int amountOfVisiableRooms;
 
+    GameManager gameManager;
+
     Dictionary<string, int> visionForRoom = new Dictionary<string, int>();
+    List<string> keys = new List<string>();
+    List<string> clearedRooms = new List<string>();
 
     IDbCommand command;
 
     void Start()
     {
         amountOfVisiableRooms = depthOfVision;
-        command = GameObject.FindWithTag("GameController").GetComponent<GameManager>().dbConnection.CreateCommand();
-        command.CommandText = "INSERT INTO inventory(trojan, worm, bug) VALUES("+trojansAmount.ToString()+","+wormsAmount.ToString()+","+bugsAmount.ToString()+")";
-        command.ExecuteNonQuery();
+        gameManager = GameObject.FindWithTag("GameController").GetComponent<GameManager>();
+        command = gameManager.dbConnection.CreateCommand();
+        // command.CommandText = "INSERT INTO inventory(trojan, worm, bug) VALUES("+trojansAmount.ToString()+","+wormsAmount.ToString()+","+bugsAmount.ToString()+")";
+        // command.ExecuteNonQuery();
+    }
+
+    void Update()
+    {
+        if(health <= 0)
+        {
+            gameManager.EndGame();
+        }
     }
 
 
@@ -82,9 +95,10 @@ public class PlayerController : MonoBehaviour
             visionForRoom.Add(roomName, depthOfVision);
     }
 
-    public void IncrementVisiableRooms()
+    public void IncrementVisiableRooms(string roomName)
     {
-        amountOfVisiableRooms++;
+        if(!clearedRooms.Contains(roomName))
+            amountOfVisiableRooms++;
     }
 
     public void IncrementVisionForRoom(string roomName)
@@ -100,5 +114,75 @@ public class PlayerController : MonoBehaviour
     public int GetVisiableRooms()
     {
         return amountOfVisiableRooms;
+    }
+
+    public void TakeMonsterAttack()
+    {
+        health--;
+    }
+
+    public string AddKey(string key_id, string room_name)
+    {
+        command.CommandText = "SELECT key_id FROM " + room_name + " WHERE id = " + key_id;
+        IDataReader reader  = command.ExecuteReader();
+        string real_key_id  = "";
+        if(reader.Read())
+        {
+            real_key_id = reader.GetInt64(0).ToString();
+        }
+        reader.Close();
+        command.CommandText = "SELECT room_name FROM keys WHERE id = "+real_key_id;
+        reader = command.ExecuteReader();
+        string locked_room = "";
+        if(reader.Read())
+        {
+            locked_room = reader.GetString(0);
+        }
+        reader.Close();
+        if(locked_room != "")
+        {
+            keys.Add(locked_room);
+            keysAmount = keys.Count;
+            command.CommandText = "DELETE FROM keys WHERE id = "+real_key_id;
+            command.ExecuteNonQuery();
+            command.CommandText = "DELETE FROM "+room_name+" WHERE id = "+key_id;
+            command.ExecuteNonQuery();
+        }
+        return locked_room;
+    }
+
+    public bool OpenTheRoom(string room_name)
+    {
+        Debug.Log("Openning " + room_name);
+        if(keys.Contains(room_name))
+        {
+            keys.Remove(room_name);
+            keysAmount = keys.Count;
+            return true;
+        }
+        else
+        {
+            foreach(string room in keys)
+            {
+                Debug.Log(room);
+            }
+        }
+        return false;
+    }
+
+    public void TakeItem(string item_type)
+    {
+        if(item_type.Equals("trojan"))
+        {
+            trojansAmount++;
+        }
+        if(item_type.Equals("worm"))
+        {
+            wormsAmount++;
+        }
+        if(item_type.Equals("bug"))
+        {
+            bugsAmount++;
+        }
     }
 }

@@ -13,6 +13,7 @@ public class TerminalController : MonoBehaviour
     public GameObject defaultRoomRow;
     public GameObject defaultRoomsTableRow;
     public GameObject defaultText;
+    public GameObject defaultTextInput;
 
     [Header("Loading Parametes")]
     public float loadingSpeed = 0.2f;
@@ -82,10 +83,25 @@ public class TerminalController : MonoBehaviour
                 {
                     gameRoomRowButton.onClick.AddListener(gameRoomRowButton.GetComponent<ButtonFunctions>().GiveMonsterID);
                 }
+                if(inputText.Equals("key"))
+                {
+                    gameRoomRowButton.onClick.AddListener(gameRoomRowButton.GetComponent<ButtonFunctions>().GiveKeyID);
+                }
+                if(inputText.Equals("item"))
+                {
+                    gameRoomRowButton.onClick.AddListener(gameRoomRowButton.GetComponent<ButtonFunctions>().GiveItemType);
+                }
             }
             column.gameObject.GetComponent<Text>().text = inputText;
             column_index++;
         }
+    }
+
+    public void ShowNewTextInput(string text)
+    {
+        GameObject gameNewTextInput = InitObjectInContent(defaultTextInput);
+        Text newText = gameNewTextInput.GetComponentInChildren<Text>();
+        newText.text = text;
     }
 
     public void ShowRoom(string room_name)

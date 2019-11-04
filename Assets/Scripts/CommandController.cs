@@ -12,7 +12,7 @@ public class CommandController : MonoBehaviour
     public int    fontSize;
     public bool   useRoomNameFormat = false;
     public string requestFor;
-    public enum CommandType {EnterTheRoom, Attack, ExitRoom, Punch, RunAway, TakeItem, TakeKey, UseItem}; 
+    public enum CommandType {EnterTheRoom, Attack, ExitRoom, Punch, RunAway, TakeItem, TakeKey, UseItem, Quit}; 
     public CommandType commandType;
 
     Text input;
@@ -27,7 +27,6 @@ public class CommandController : MonoBehaviour
             command = string.Format(command, GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>().GetCurrentRoom());
         }
         Text text = GetComponentInChildren<Text>();
-        // Debug.Log(gameObject.name + " " + description.Length.ToString());
         if(description.Length < 30)
             text.text = description + "\t\t" + command;
         else

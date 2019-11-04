@@ -10,6 +10,7 @@ public class ButtonFunctions : MonoBehaviour
     UIManager          uiManager;
     CommandController  commandController; 
 
+
     void Start()
     {
         input             = GameObject.FindGameObjectWithTag("Input").GetComponent<Text>();
@@ -22,6 +23,12 @@ public class ButtonFunctions : MonoBehaviour
     {
         input.text = commandController.command;
         uiManager.SetLastCommand(commandController);
+    }
+
+    public void ToCommandLinePunch()
+    {
+        ToCommandLine();
+        terminal.ShowNewTextInput("Type monster secrete:");
     }
 
     public void GiveRoomName()
@@ -42,10 +49,51 @@ public class ButtonFunctions : MonoBehaviour
             {
                 if(column.gameObject.name.Equals("ID"))
                 {
-                    uiManager.GetLastPressed().TakeRequest(column.gameObject.GetComponent<Text>().text);
+                    string monster_id = column.gameObject.GetComponent<Text>().text;
+                    uiManager.GetLastPressed().TakeRequest(monster_id);
+                    uiManager.SetCurrentMonsterID(monster_id);
                     break;
                 }
             }
+        }
+    }
+
+    public void GiveKeyID()
+    {
+        if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_KEYID))
+        {
+            foreach(Transform column in transform)
+            {
+                if(column.gameObject.name.Equals("ID"))
+                {
+                    string key_id = column.gameObject.GetComponent<Text>().text;
+                    uiManager.GetLastPressed().TakeRequest(key_id);
+                    uiManager.SetCurrentKeyID(key_id);
+                    break;
+                }
+            }
+        }
+    }
+
+    public void GiveItemType()
+    {
+        if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_ITEMTYPE))
+        {
+            string item_type = ""; 
+            string item_id   = "";
+            foreach(Transform column in transform)
+            {
+                if(column.gameObject.name.Equals("NAME"))
+                {
+                    item_type = column.gameObject.GetComponent<Text>().text;
+                    uiManager.GetLastPressed().TakeRequest(item_type);
+                }
+                else if(column.gameObject.name.Equals("ID"))
+                {
+                    item_id = column.gameObject.GetComponent<Text>().text;
+                }
+            }
+            uiManager.SetCurrentItemTypeAndID(item_type, item_id);
         }
     }
 }
