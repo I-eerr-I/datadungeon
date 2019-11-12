@@ -6,14 +6,16 @@ using UnityEngine.UI;
 
 public class CommandController : MonoBehaviour
 {
-
+    [TextArea]
     public string description;
+    [TextArea]
     public string command;
     public int    fontSize;
     public bool   useRoomNameFormat = false;
     public string requestFor;
-    public enum CommandType {EnterTheRoom, Attack, ExitRoom, Punch, RunAway, TakeItem, TakeKey, UseItem, Quit}; 
+    public enum CommandType {EnterTheRoom, Attack, ExitRoom, Punch, RunAway, TakeItem, TakeKey, UseItem, Quit, ExitMaze}; 
     public CommandType commandType;
+    public bool isStandardCommand = true;
 
     Text input;
 
@@ -21,17 +23,19 @@ public class CommandController : MonoBehaviour
     void Start()
     {
         input = GameObject.FindGameObjectWithTag("Input").GetComponent<Text>();
-
-        if(useRoomNameFormat)
+        if(isStandardCommand)
         {
-            command = string.Format(command, GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>().GetCurrentRoom());
+            if(useRoomNameFormat)
+            {
+                command = string.Format(command, GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>().GetCurrentRoom());
+            }
+            Text text = GetComponentInChildren<Text>();
+            if(description.Length < 30)
+                text.text = description + "\t\t" + command;
+            else
+                text.text = description + "\t" + command;
+            text.fontSize = fontSize;
         }
-        Text text = GetComponentInChildren<Text>();
-        if(description.Length < 30)
-            text.text = description + "\t\t" + command;
-        else
-            text.text = description + "\t" + command;
-        text.fontSize = fontSize;
     }
 
     public void TakeRequest(string request)

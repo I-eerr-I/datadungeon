@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
+using Mono.Data.Sqlite;
 
 public class UIManager : MonoBehaviour
 {   
@@ -32,7 +33,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] inRoomCommands;
     public GameObject[] inFightCommands;
 
-    public enum GameState {InMaze, InRoom, InFight};
+    public enum GameState {InMaze, InRoom, InFight, InMazeExit};
     public GameState currentState;
     GameState savedState;
     
@@ -58,6 +59,7 @@ public class UIManager : MonoBehaviour
     string currentKeyID          = "";
     string currentItemType       = "";
     string currentItemID         = "";
+    string currentUseItemType   = ""; 
 
     void Start()
     {
@@ -78,45 +80,62 @@ public class UIManager : MonoBehaviour
         }
         if(Input.GetButtonDown("Enter"))
         {
-            if(lastPressed != null)
+            try
             {
-                switch(lastPressed.commandType)
+                if(lastPressed != null)
                 {
-                    case CommandController.CommandType.EnterTheRoom:
-                    EnterTheRoom();
-                    break;
+                    switch(lastPressed.commandType)
+                    {
+                        case CommandController.CommandType.EnterTheRoom:
+                        EnterTheRoom();
+                        break;
 
-                    case CommandController.CommandType.ExitRoom:
-                    ExitRoom();
-                    break;
+                        case CommandController.CommandType.ExitRoom:
+                        ExitRoom();
+                        break;
 
-                    case CommandController.CommandType.Attack:
-                    Attack();
-                    break;
+                        case CommandController.CommandType.Attack:
+                        Attack();
+                        break;
 
-                    case CommandController.CommandType.RunAway:
-                    RunAway();
-                    break;
+                        case CommandController.CommandType.RunAway:
+                        RunAway();
+                        break;
 
-                    case CommandController.CommandType.Quit:
-                    Quit();
-                    break;
+                        case CommandController.CommandType.Quit:
+                        Quit();
+                        break;
 
-                    case CommandController.CommandType.TakeKey:
-                    TakeKey();
-                    break;
+                        case CommandController.CommandType.TakeKey:
+                        TakeKey();
+                        break;
 
-                    case CommandController.CommandType.TakeItem:
-                    TakeItem();
-                    break;
+                        case CommandController.CommandType.TakeItem:
+                        TakeItem();
+                        break;
 
-                }
-                if(!lastPressed.commandType.Equals(CommandController.CommandType.Punch))
-                {
-                    lastPressed = null;
-                    lastRequest = "";
-                } 
+                        case CommandController.CommandType.UseItem:
+                        UseItem();
+                        break;
+
+                        case CommandController.CommandType.ExitMaze:
+                        ExitMaze();
+                        break;
+
+                    }
+                    if(!lastPressed.commandType.Equals(CommandController.CommandType.Punch))
+                    {
+                        lastPressed = null;
+                        lastRequest = "";
+                    }
+                }   
             }
+            catch(SqliteException)
+            {
+                lastPressed = null;
+                lastRequest = "";
+                inputField.text  = "...";
+            } 
         }
 
         UpdateInventory();
@@ -124,6 +143,12 @@ public class UIManager : MonoBehaviour
         UpdateCharacteristics();
         CheckAndSetUpdates();
         if(updateVisual) UpdateVisual();
+    }
+
+    public void ExitMaze()
+    {
+        currentState = GameState.InMazeExit;
+        terminal.ShowStatistics(gameManager.GetKilledMonsters());
     }
 
     public void EnterTheRoom()
@@ -144,7 +169,6 @@ public class UIManager : MonoBehaviour
         else
         {
             bool oppened = player_controller.OpenTheRoom(currentRoom);
-            Debug.Log(oppened.ToString() + " " + currentRoom);
             if(!oppened)
             {
                 terminal.ShowNewText("<color=#ff7777>[ERROR] THE ROOM IS LOCKED. NEED KEY</color>");
@@ -183,6 +207,7 @@ public class UIManager : MonoBehaviour
 
     public void TakeItem()
     {
+        if(currentItemType == "" || currentItemID == "" || currentRoom == "") terminal.ShowError("TakeItem");
         player_controller.TakeItem(currentItemType);
         gameManager.DeleteItem(currentItemID, currentRoom);
         currentItemType = "";
@@ -209,6 +234,29 @@ public class UIManager : MonoBehaviour
     {
         currentState = GameState.InFight;
         terminal.ShowNewTextLoading("Started monster destroying process.\n");
+    }
+
+    public void UseItem()
+    {
+        PlayerController.UsedItemType usedItemType = player_controller.UseItem(currentUseItemType, currentRoom);
+        if(usedItemType == PlayerController.UsedItemType.Nothing)
+        {
+            terminal.ShowNewText("<color=#ff7777>CAN'T USE ITEM</color>");
+        }
+        if(usedItemType == PlayerController.UsedItemType.Bug)
+        {
+            terminal.ShowNewText("<color=#33ff33>You've restored your health.</color>");
+        }
+        if(usedItemType == PlayerController.UsedItemType.Trojan)
+        {
+            terminal.ShowNewText("<color=#7777ff>The monster has been destroied.</color>");
+            EnterTheRoom();
+        }
+        if(usedItemType == PlayerController.UsedItemType.Worm)
+        {
+            terminal.ShowNewText("<color=#77ffff>Monster's secrete has been expanded.</color>");
+        }
+        currentUseItemType = "";
     }
 
     public void Punch()
@@ -239,6 +287,16 @@ public class UIManager : MonoBehaviour
         terminal.ShowNewText("It's okay. You just need to prepare...\n");
         EnterTheRoom();
         currentMonsterID = "";
+    }
+
+    public void MonsterMissed()
+    {
+        terminal.ShowNewTextLoading("<color=#ffff77>Monster's missed!</color>");
+    }
+
+    public string GetCurrentMonsterID()
+    {
+        return currentMonsterID;
     }
 
     public string GetCurrentRoom()
@@ -283,6 +341,11 @@ public class UIManager : MonoBehaviour
         this.lastRequest = lastPressed.requestFor;
     }
 
+    public void SetCurrentUseItemType(string item_type)
+    {
+        currentUseItemType = item_type;
+    }
+
     public string GetLastRequest()
     {
         return lastRequest;
@@ -317,20 +380,29 @@ public class UIManager : MonoBehaviour
             case GameState.InFight:
             EnterCommandsIn(inFightCommands);
             break;
+
+            case GameState.InMazeExit:
+            ClearCommands();
+            break;
         }
         updateVisual = false;
     }
 
     void EnterCommandsIn(GameObject[] commandsList)
     {
-        foreach(Transform initedCommand in commands.transform)
-        {
-            Destroy(initedCommand.gameObject);
-        }
+        ClearCommands();
         foreach(GameObject command in commandsList)
         {
             GameObject instantiatedCommand = Instantiate(command);
             instantiatedCommand.transform.SetParent(commands.transform);
+        }
+    }
+
+    void ClearCommands()
+    {
+        foreach(Transform initedCommand in commands.transform)
+        {
+            Destroy(initedCommand.gameObject);
         }
     }
 
@@ -358,17 +430,20 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void EndGameAnimation()
+    public void EndGameAnimation(int monster_killed)
     {
-        StartCoroutine("end_game");
+        IEnumerator coroutine = end_game(monster_killed);
+        StartCoroutine(coroutine);
     }
 
-    IEnumerator end_game()
+
+    IEnumerator end_game(int monster_killed)
     {
         for(int i = 0; i < 10; i++)
         {
             terminal.ShowNewText("<color=#ff7777>ERROR!</color>");
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
         }
+        terminal.ShowNewText("<color=#ffff77>You've killed " + monster_killed.ToString() + " monsters</color>");
     }
 }

@@ -252,6 +252,7 @@ GameObject:
   - component: {fileID: 5822916741817699114}
   - component: {fileID: 5822916741817699112}
   - component: {fileID: 5822916741817699113}
+  - component: {fileID: 6268350177370727290}
   m_Layer: 5
   m_Name: Default TextInput Row
   m_TagString: Untagged
@@ -316,6 +317,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6268350177370727290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5822916741817699115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb040b4a0bf514f48ae75b832763895c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6513706913872189773
 GameObject:
   m_ObjectHideFlags: 0

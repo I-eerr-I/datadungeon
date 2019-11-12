@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 2635865442671568357}
   - component: {fileID: 5610579036846681194}
   - component: {fileID: 5610579036626756353}
+  - component: {fileID: 5963450036218379989}
   m_Layer: 5
   m_Name: CMD TakeItem
   m_TagString: Untagged
@@ -159,6 +160,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b470bb885af51a84d8035980fe057a2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5963450036218379989
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2635865442671568359}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb040b4a0bf514f48ae75b832763895c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &2635865443401540357

@@ -8,6 +8,11 @@ TagManager:
   - UIManager
   - Text
   - Terminal
+  - bug
+  - trojan
+  - worm
+  - Visual
+  - HeroAvatar
   layers:
   - Default
   - TransparentFX

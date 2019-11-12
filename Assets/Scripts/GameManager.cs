@@ -5,6 +5,7 @@ using Mono.Data.Sqlite;
 using System.Collections;
 using Random=UnityEngine.Random;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class GameManager : MonoBehaviour
     string           connection_string;
     IDbCommand       command;
     PlayerController player_controller;
+
+    public enum UPGRADABLE {DOV, MH, LUCK};
 
     // Database constants
     const string   ROOMS_TABLENAME     = "rooms";
@@ -37,27 +40,14 @@ public class GameManager : MonoBehaviour
     const string   ROOMS_TABLE         = @"
     (id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(45) UNIQUE,
-    blocked TINYINT NOT NULL DEFAULT 0)"; 
+    locked TINYINT NOT NULL DEFAULT 0)"; 
     const string   KEYS_TABLE          = @"
     (id INTEGER PRIMARY KEY,
-    room_name VARCHAR(45),
-    FOREIGN KEY(room_name) REFERENCES " + ROOM_TABLENAME + "(name) ON DELETE CASCADE)";
+    room_name VARCHAR(45))";
     const string   MONSTERS_TABLE      = @"
     (id INTEGER PRIMARY KEY,
     max_secrete INTEGER NOT NULL,
     min_secrete INTEGER NOT NULL)"; 
-    // const string   INVENTORY_TABLE     = @"
-    // (trojan INTEGER DEFAULT 0,
-    // worm INTEGER DEFAULT 0,
-    // bug INTEGER DEFAULT 0)";
-    // const string   STATUS_TABLE        = @"
-    // (hp INTEGER NOT NULL DEFAULT 5,
-    // deapth_of_vision INTEGER NOT NULL DEFAULT 2,
-    // max_hp INTEGER NOT NULL DEFAULT 5,
-    // luck REAL NOT NULL DEFAULT 0.2)" ;
-    // const string   MYKEYS_TABLE        = @"
-    // (key_id INTEGER,
-    // FOREIGN KEY(key_id) REFERENCES " + KEYS_TABLENAME + "(id))";
     const string   ROOM_TABLE          = @"
     (id INTEGER PRIMARY KEY,
     name VARCHAR(45) NOT NULL,
@@ -73,7 +63,7 @@ public class GameManager : MonoBehaviour
     const int         MAX_ROOMS_AMOUNT = 4;
     const string      DOOR_TYPENAME    = "door";
     const string      KEY_TYPENAME     = "key";
-    const string      EXITDOOR_NAME    = "Exit";
+    const string      EXITDOOR_NAME    = "MAZE EXIT";
 
     // Monsters parameters
     int          monster_id                  = 0;
@@ -105,7 +95,11 @@ public class GameManager : MonoBehaviour
     const string   BUG_TYPENAME     = "bug";
     string[]       ITEMS            = {WORM_TYPENAME, TROJAN_TYPENAME, BUG_TYPENAME};
 
-    int monster_killed = 0;
+    int monster_killed   = 0;
+    int max_level_points = 0;
+    bool game_over       = false;
+    bool ended_game      = false;
+    bool wait_for_enter  = false;
 
     void Awake()
     {
@@ -119,10 +113,33 @@ public class GameManager : MonoBehaviour
         GenerateMaze();
     }
 
+    void Update()
+    {
+        if(game_over)
+        {
+            uiManager.EndGameAnimation(monster_killed);
+            ended_game = true;
+            game_over  = false;
+            wait_for_enter = true;
+            terminal.ShowNewTextLoading("Press Enter To Continue...");
+        }
+
+        if(wait_for_enter && Input.GetButtonDown("Enter"))
+        {
+            Reload();
+        }
+    }
+
+    void Reload()
+    {
+        int scene = SceneManager.GetActiveScene().buildIndex;
+        SceneManager.LoadScene(scene, LoadSceneMode.Single);
+    }
+
     void OpenConnection()
     {
         connection_string = "URI=file:" + Application.persistentDataPath + "/" + MAZE_NAME;
-        dbConnection     = new SqliteConnection(connection_string);
+        dbConnection      = new SqliteConnection(connection_string);
         dbConnection.Open();
     }
 
@@ -186,18 +203,6 @@ public class GameManager : MonoBehaviour
             {
                 command.CommandText += MONSTERS_TABLE;
             }
-            // else if(table.Equals(INVENTORY_TABLENAME))
-            // {
-            //     command.CommandText += INVENTORY_TABLE;
-            // }
-            // else if(table.Equals(STATUS_TABLENAME))
-            // {
-            //     command.CommandText += STATUS_TABLE;
-            // }   
-            // else if(table.Equals(MYKEYS_TABLENAME))
-            // {
-            //     command.CommandText += MYKEYS_TABLE;
-            // }
             command.ExecuteNonQuery();
         }
     } 
@@ -205,6 +210,7 @@ public class GameManager : MonoBehaviour
     void AddMonstersToRoom(string room_name)
     {
         int monsters_amount = Random.Range(MIN_MONSTERS_AMOUNT + player_controller.level, MAX_MONSTERS_AMOUNT + player_controller.level);
+        max_level_points += monsters_amount*player_controller.level*10;
         for(int m = 0; m < monsters_amount; m++)
         {
             command.CommandText  = "INSERT INTO "+MONSTERS_TABLENAME+"(id, min_secrete, max_secrete) VALUES (" + monster_id.ToString() + ", ";
@@ -255,6 +261,7 @@ public class GameManager : MonoBehaviour
 
     void AddRooms()
     {
+        max_level_points += rooms_amount * player_controller.level*10;
         for (int i = 0; i < rooms_amount; i++)
         {
             string room_name    = "room" + i.ToString();
@@ -290,7 +297,7 @@ public class GameManager : MonoBehaviour
             }
             command.CommandText = "INSERT INTO " + KEYS_TABLENAME + "(id, room_name) VALUES("+ key_id.ToString() + ", '" + rooms[blocked_room] +"')";
             command.ExecuteNonQuery();
-            command.CommandText = "UPDATE " + ROOMS_TABLENAME + " SET blocked = 1 WHERE name = '" + rooms[blocked_room] + "'";
+            command.CommandText = "UPDATE " + ROOMS_TABLENAME + " SET locked = 1 WHERE name = '" + rooms[blocked_room] + "'";
             command.ExecuteNonQuery();
             string key_keeper = rooms[Random.Range(0, blocked_room-2)];  
             string key_name   = "key for " + rooms[blocked_room];
@@ -341,7 +348,7 @@ public class GameManager : MonoBehaviour
 
     public bool IsTheRoomLocked(string roomName)
     {
-        command.CommandText = "SELECT blocked FROM rooms WHERE name = '"+roomName+"'";
+        command.CommandText = "SELECT locked FROM rooms WHERE name = '"+roomName+"'";
         IDataReader reader  = command.ExecuteReader();
         int blocked = 0;
         if(reader.Read())
@@ -352,15 +359,11 @@ public class GameManager : MonoBehaviour
         return (blocked == 1)? true : false; 
     }
 
-    public bool PunchMonster(string room_monster_id, string room_name, int secrete, out bool is_lower)
+    public bool PunchMonster(string monster_id, string room_name, int secrete, out bool is_lower)
     {
-        command.CommandText = "SELECT monster_id FROM "+room_name+" WHERE id = "+room_monster_id;
-        IDataReader reader  = command.ExecuteReader();
-        reader.Read();
-        string monster_id   = reader.GetInt64(0).ToString();
-        reader.Close();
+        player_controller.AttackAnimation();
         command.CommandText = "SELECT min_secrete, max_secrete FROM monsters WHERE id = "+monster_id;
-        reader  = command.ExecuteReader();
+        IDataReader reader  = command.ExecuteReader();
         bool is_punched = false;
         is_lower        = false;
         while(reader.Read())
@@ -383,18 +386,55 @@ public class GameManager : MonoBehaviour
         reader.Close();
         if(is_punched)
         {
-            monster_killed++;
-            command.CommandText = "DELETE FROM monsters WHERE id = "+monster_id;
-            command.ExecuteNonQuery();
-            command.CommandText = "DELETE FROM " + room_name + " WHERE monster_id = "+monster_id;
-            command.ExecuteNonQuery();
-            player_controller.IncrementVisionForRoom(room_name);
+            DeleteMonster(monster_id, room_name);
         }
         else
         {
-            player_controller.TakeMonsterAttack();
+            if(!player_controller.TakeMonsterAttack())
+            {
+                uiManager.MonsterMissed();
+            }
         }
         return is_punched;
+    }
+
+    public string GetMonsterID(string room_monster_id, string room_name)
+    {
+        command.CommandText = "SELECT monster_id FROM "+room_name+" WHERE id = "+room_monster_id;
+        IDataReader reader  = command.ExecuteReader();
+        if(!reader.Read()) return "";
+        string monster_id = reader.GetInt64(0).ToString();
+        reader.Close();
+        return monster_id;
+    }
+
+    public bool ExpandMonsterSecrete(string monster_id)
+    {
+        command.CommandText = "SELECT min_secrete, max_secrete FROM monsters WHERE id = "+monster_id;
+        IDataReader reader  = command.ExecuteReader();
+        if(!reader.Read()) return false;
+        long min_secrete = reader.GetInt64(0);
+        long max_secrete = reader.GetInt64(1);
+        reader.Close();
+        min_secrete = (long)((float)min_secrete - 0.25f*(float)min_secrete);
+        max_secrete = (long)((float)max_secrete + 0.25*(float)max_secrete);
+        if(min_secrete < 0) min_secrete = 0;
+        if(max_secrete > MAX_SECRETE_NUMBER) max_secrete = MAX_SECRETE_NUMBER;
+        command.CommandText = "UPDATE monsters SET min_secrete = "+min_secrete+", max_secrete = "+max_secrete+" WHERE id = "+monster_id;
+        command.ExecuteNonQuery();
+        return true;
+    }
+
+    public bool DeleteMonster(string monster_id, string room_name)
+    {
+        monster_killed++;
+        player_controller.IncrementLevelPoints();
+        command.CommandText = "DELETE FROM monsters WHERE id = "+monster_id;
+        command.ExecuteNonQuery();
+        command.CommandText = "DELETE FROM " + room_name + " WHERE monster_id = " + monster_id;
+        command.ExecuteNonQuery();
+        player_controller.IncrementVisionForRoom(room_name);
+        return true;
     }
     
     public void Quit()
@@ -405,12 +445,15 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
-        uiManager.EndGameAnimation();
+        if(!ended_game)
+        {
+            game_over = true;
+        }
     }
 
     public void UnlockTheRoom(string room_name)
     {
-        command.CommandText = "UPDATE rooms SET blocked = 0 WHERE name = '"+room_name+"'";
+        command.CommandText = "UPDATE rooms SET locked = 0 WHERE name = '"+room_name+"'";
         command.ExecuteNonQuery();
     }
 
@@ -418,5 +461,27 @@ public class GameManager : MonoBehaviour
     {
         command.CommandText = "DELETE FROM " + room_name + " WHERE id = " + item_id;
         command.ExecuteNonQuery();
+    }
+
+    public void Upgrade(UPGRADABLE upgrade_type)
+    {
+        player_controller.Upgrade(upgrade_type);
+        SaveSystem.Save(player_controller);
+        Reload();
+    }
+
+    public int GetKilledMonsters()
+    {
+        return monster_killed;
+    }
+
+    public int GetMaxLevelPoints()
+    {
+        return max_level_points;
+    }
+
+    public void ActivateWaitForEnterToEnd()
+    {
+        wait_for_enter = true;
     }
 }

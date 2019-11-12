@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5508422654013635352}
   - component: {fileID: 2682288818109231767}
   - component: {fileID: 2682288817255022076}
+  - component: {fileID: -2480450115345597960}
   m_Layer: 5
   m_Name: CMD ExitRoom
   m_TagString: Untagged
@@ -159,6 +160,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b470bb885af51a84d8035980fe057a2d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-2480450115345597960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5508422654013635354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb040b4a0bf514f48ae75b832763895c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &5508422655179881976

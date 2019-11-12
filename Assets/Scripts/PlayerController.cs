@@ -4,6 +4,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random=UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,12 +22,15 @@ public class PlayerController : MonoBehaviour
     public int trojansAmount = 0;
     public int wormsAmount   = 0;
 
+
+    public enum UsedItemType {Trojan, Bug, Worm, Nothing};
+
     int maxLevelPoints;
 
     // Minimum Characteristics
     int   minLevel          = 1;
     int   minLevelPoints    = 0;
-    int   minMaxLevelPoints = 100; 
+    int   minMaxLevelPoints = 50; 
     int   minDepthOfVision  = 2;
     int   minMaxHealth      = 5;
     float minLuck           = 0.2f;
@@ -39,6 +43,8 @@ public class PlayerController : MonoBehaviour
     int amountOfVisiableRooms;
 
     GameManager gameManager;
+    UIManager   uiManager;
+    Animator    heroAvatar;
 
     Dictionary<string, int> visionForRoom = new Dictionary<string, int>();
     List<string> keys = new List<string>();
@@ -50,15 +56,21 @@ public class PlayerController : MonoBehaviour
     {
         amountOfVisiableRooms = depthOfVision;
         gameManager = GameObject.FindWithTag("GameController").GetComponent<GameManager>();
-        command = gameManager.dbConnection.CreateCommand();
-        // command.CommandText = "INSERT INTO inventory(trojan, worm, bug) VALUES("+trojansAmount.ToString()+","+wormsAmount.ToString()+","+bugsAmount.ToString()+")";
-        // command.ExecuteNonQuery();
+        command     = gameManager.dbConnection.CreateCommand();
+        uiManager   = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
+        heroAvatar  = GameObject.FindGameObjectWithTag("HeroAvatar").GetComponent<Animator>();
     }
 
     void Update()
     {
+        heroAvatar.SetBool("IsDead", false);
+        heroAvatar.SetBool("IsRestoreHealth", false);
+        heroAvatar.SetBool("IsAttack", false);
+        heroAvatar.SetFloat("HealthPercents", (float)health/(float)maxHealth * 100);
+
         if(health <= 0)
         {
+            heroAvatar.SetBool("IsDead", true);
             gameManager.EndGame();
         }
     }
@@ -87,6 +99,7 @@ public class PlayerController : MonoBehaviour
         this.depthOfVision = data.depthOfVision;
         this.maxHealth     = data.maxHealth;
         this.luck          = data.luck;
+        this.health        = data.maxHealth;
     }
 
     public void AddRoomForVision(string roomName)
@@ -98,7 +111,11 @@ public class PlayerController : MonoBehaviour
     public void IncrementVisiableRooms(string roomName)
     {
         if(!clearedRooms.Contains(roomName))
+        {
+            IncrementLevelPoints();
+            clearedRooms.Add(roomName);
             amountOfVisiableRooms++;
+        }
     }
 
     public void IncrementVisionForRoom(string roomName)
@@ -116,9 +133,39 @@ public class PlayerController : MonoBehaviour
         return amountOfVisiableRooms;
     }
 
-    public void TakeMonsterAttack()
+    public void AttackAnimation()
     {
+        heroAvatar.SetBool("IsAttack", true);
+    }
+
+    public void Upgrade(GameManager.UPGRADABLE upgrade_type)
+    {
+        switch(upgrade_type)
+        {
+            case GameManager.UPGRADABLE.DOV:
+            depthOfVision += depthOfVisionUpgrade;
+            break;
+
+            case GameManager.UPGRADABLE.MH:
+            maxHealth += maxHealthUpgrade;
+            break;
+
+            case GameManager.UPGRADABLE.LUCK:
+            luck += luckUpgrade;
+            break;
+        }
+        level++;
+    }
+
+    public bool TakeMonsterAttack()
+    {
+        heroAvatar.SetBool("IsAttack", true);
+        if(Random.Range(0f,1f) < luck)
+        {
+            return false;
+        }
         health--;
+        return true;
     }
 
     public string AddKey(string key_id, string room_name)
@@ -153,7 +200,6 @@ public class PlayerController : MonoBehaviour
 
     public bool OpenTheRoom(string room_name)
     {
-        Debug.Log("Openning " + room_name);
         if(keys.Contains(room_name))
         {
             keys.Remove(room_name);
@@ -184,5 +230,48 @@ public class PlayerController : MonoBehaviour
         {
             bugsAmount++;
         }
+    }
+
+    public UsedItemType UseItem(string item_type, string room_name)
+    {
+        if(item_type.Equals("trojan") && trojansAmount > 0)
+        {
+            if(gameManager.DeleteMonster(uiManager.GetCurrentMonsterID(), room_name))
+            {
+                trojansAmount--;
+                return UsedItemType.Trojan;
+            }
+        }
+        else if(item_type.Equals("worm") && wormsAmount > 0)
+        {
+            if(gameManager.ExpandMonsterSecrete(uiManager.GetCurrentMonsterID()))
+            {
+                wormsAmount--;
+                return UsedItemType.Worm;
+            }
+        }
+        else if(item_type.Equals("bug") && bugsAmount > 0)
+        {
+            heroAvatar.SetBool("IsRestoreHealth", true);
+            health = maxHealth;
+            bugsAmount--;
+            return UsedItemType.Bug;
+        }
+        return UsedItemType.Nothing;
+    }
+
+    public int GetCleanedRoomsAmount()
+    {
+        return clearedRooms.Count;
+    }
+
+    public void IncrementLevelPoints()
+    {
+        levelPoints += 10 * level;
+    }
+
+    public int GetMaxLevelPoints()
+    {
+        return maxLevelPoints;
     }
 }

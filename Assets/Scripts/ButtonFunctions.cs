@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class ButtonFunctions : MonoBehaviour
 {
     Text               input;
+    GameManager        gameManager;
     TerminalController terminal;
     UIManager          uiManager;
     CommandController  commandController; 
@@ -17,6 +18,7 @@ public class ButtonFunctions : MonoBehaviour
         terminal          = GameObject.FindGameObjectWithTag("Terminal").GetComponent<TerminalController>();
         uiManager         = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
         commandController = GetComponent<CommandController>();
+        gameManager       = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
     }
 
     public void ToCommandLine()
@@ -29,6 +31,21 @@ public class ButtonFunctions : MonoBehaviour
     {
         ToCommandLine();
         terminal.ShowNewTextInput("Type monster secrete:");
+    }
+
+    public void UpgradeDOV()
+    {
+        gameManager.Upgrade(GameManager.UPGRADABLE.DOV);
+    }
+
+    public void UpgradeMH()
+    {
+        gameManager.Upgrade(GameManager.UPGRADABLE.MH);
+    }
+
+    public void UpgradeLuck()
+    {
+        gameManager.Upgrade(GameManager.UPGRADABLE.LUCK);
     }
 
     public void GiveRoomName()
@@ -49,7 +66,7 @@ public class ButtonFunctions : MonoBehaviour
             {
                 if(column.gameObject.name.Equals("ID"))
                 {
-                    string monster_id = column.gameObject.GetComponent<Text>().text;
+                    string monster_id = gameManager.GetMonsterID(column.gameObject.GetComponent<Text>().text, uiManager.GetCurrentRoom());
                     uiManager.GetLastPressed().TakeRequest(monster_id);
                     uiManager.SetCurrentMonsterID(monster_id);
                     break;
@@ -95,5 +112,20 @@ public class ButtonFunctions : MonoBehaviour
             }
             uiManager.SetCurrentItemTypeAndID(item_type, item_id);
         }
+    }
+
+    public void GiveItemTypeForUse()
+    {
+        if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_ITEMTYPE) && 
+           uiManager.GetLastPressed().commandType.Equals(CommandController.CommandType.UseItem))
+        {
+            InitTakeItemType(gameObject.tag);
+        }
+    }
+
+    void InitTakeItemType(string item_type)
+    {
+        uiManager.GetLastPressed().TakeRequest(item_type);
+        uiManager.SetCurrentUseItemType(item_type);
     }
 }
