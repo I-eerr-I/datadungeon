@@ -1044,6 +1044,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   monster: {fileID: 21300000, guid: f9f3b4fca78d77243a73d89783f7c4d0, type: 3}
   monsterAttack: {fileID: 21300000, guid: 1e3af14e3485d824f9ce0213c393f267, type: 3}
+  monsterHurt: {fileID: 21300000, guid: 406242a3b999d464f8b71033f2d86420, type: 3}
   monsterDeadBlack: {fileID: 21300000, guid: 59ff0004ffb0cc747b980a1c1e638a7f, type: 3}
   monsterDeadWhite: {fileID: 21300000, guid: e475b4a4f7ed02e41ae293c79761c17f, type: 3}
   noData: {fileID: 21300000, guid: 6448f01e25520884881abe79952a8dd5, type: 3}
