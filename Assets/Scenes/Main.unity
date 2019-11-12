@@ -967,6 +967,7 @@ GameObject:
   - component: {fileID: 304595264}
   - component: {fileID: 304595266}
   - component: {fileID: 304595265}
+  - component: {fileID: 304595267}
   m_Layer: 5
   m_Name: Visual
   m_TagString: Untagged
@@ -1006,12 +1007,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.9019608}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 6448f01e25520884881abe79952a8dd5, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1029,6 +1030,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 304595263}
   m_CullTransparentMesh: 0
+--- !u!114 &304595267
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304595263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6e372c0e7c46ec46bda7a427e1b8263, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monster: {fileID: 21300000, guid: f9f3b4fca78d77243a73d89783f7c4d0, type: 3}
+  monsterAttack: {fileID: 21300000, guid: 1e3af14e3485d824f9ce0213c393f267, type: 3}
+  monsterDeadBlack: {fileID: 21300000, guid: 59ff0004ffb0cc747b980a1c1e638a7f, type: 3}
+  monsterDeadWhite: {fileID: 21300000, guid: e475b4a4f7ed02e41ae293c79761c17f, type: 3}
+  noData: {fileID: 21300000, guid: 6448f01e25520884881abe79952a8dd5, type: 3}
+  animationSpeed: 0.2
 --- !u!1 &420317120
 GameObject:
   m_ObjectHideFlags: 0
@@ -1291,7 +1310,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectDescription: This little beatles of the code can restore your health. Just
     use them in you monster fight.
-  objectImage: {fileID: 21300000, guid: d689b4e4b3aa23749942fbc1ee14a958, type: 3}
+  objectImage: {fileID: 21300000, guid: b12b10c7d2d72964191b8f373054b731, type: 3}
 --- !u!1 &447119699
 GameObject:
   m_ObjectHideFlags: 0
@@ -1730,6 +1749,7 @@ MonoBehaviour:
   maxHealth: {fileID: 1948239297}
   luck: {fileID: 2082723745}
   commands: {fileID: 1787754347}
+  visual: {fileID: 304595267}
   inMazeCommands:
   - {fileID: 7586522822110775013, guid: cc2e8260a2e4d2548919dd92aae3a745, type: 3}
   - {fileID: 1832028788796949478, guid: 638d3570b42e959438e6d5b6ba99b0a8, type: 3}

@@ -27,6 +27,7 @@ public class UIManager : MonoBehaviour
 
     [Header("Visual Part")]
     public GameObject commands;
+    public VisualAnimation visual;
 
     [Header("Command Buttons")]
     public GameObject[] inMazeCommands;
@@ -264,11 +265,13 @@ public class UIManager : MonoBehaviour
         bool is_lower;
         if(gameManager.PunchMonster(currentMonsterID, currentRoom, currentSecrete, out is_lower))
         {
+            visual.PlayDeadAnimation();
             terminal.ShowNewText("<color=#7777ff>Monster's been destroyed.</color>");
             EnterTheRoom();
         }
         else
         {
+            visual.PlayMonsterAttackAnimation();
             if(is_lower)
             {
                 terminal.ShowNewText("<color=#ff7777>The secrete is lower!</color>");

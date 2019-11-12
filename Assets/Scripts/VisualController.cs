@@ -12,6 +12,7 @@ public class VisualController : MonoBehaviour
 
     Image visualSprite;
     Text  visualText;
+    Animator visual;
 
     void  Start()
     {

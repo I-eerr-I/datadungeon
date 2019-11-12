@@ -69,7 +69,7 @@ public class TerminalController : MonoBehaviour
             {
                 coroutines.Add(show_new_text("<color=#ff7777>Level upgrade: FALSE</color>"));
                 coroutines.Add(show_counting_text("To new level: {0}", Mathf.Abs(level_points_diff), 10, animation_speed));
-                coroutines.Add(show_new_text("<color=#ffffff>Press Enter to continue..."));
+                coroutines.Add(show_new_text("<color=#ffffff>Press Enter to continue...</color>"));
                 gameManager.ActivateWaitForEnterToEnd();
             }
             
