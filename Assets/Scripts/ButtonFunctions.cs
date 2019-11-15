@@ -27,6 +27,12 @@ public class ButtonFunctions : MonoBehaviour
         uiManager.SetLastCommand(commandController);
     }
 
+    public void ToCommandLineWithText(string text)
+    {
+        ToCommandLine();
+        terminal.ShowNewText(text);
+    }
+
     public void ToCommandLinePunch()
     {
         ToCommandLine();

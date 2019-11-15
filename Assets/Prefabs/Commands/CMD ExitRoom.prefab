@@ -150,6 +150,7 @@ MonoBehaviour:
   useRoomNameFormat: 1
   requestFor: 
   commandType: 2
+  isStandardCommand: 1
 --- !u!114 &2682288817255022076
 MonoBehaviour:
   m_ObjectHideFlags: 0

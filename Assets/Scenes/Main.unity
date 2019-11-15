@@ -166,6 +166,8 @@ MonoBehaviour:
   player: {fileID: 213378081950153488, guid: e79a68cec02f7a24d8a472f3d60e9a7b, type: 3}
   uiManager: {fileID: 588582114}
   terminal: {fileID: 577207110}
+  tutorial: {fileID: 2130211253}
+  isTutorial: 0
 --- !u!1 &26542513
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,6 +274,7 @@ RectTransform:
   - {fileID: 1556766096}
   - {fileID: 1661497282}
   - {fileID: 692074799}
+  - {fileID: 108907824}
   m_Father: {fileID: 1755716314}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -423,13 +426,13 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 692074799}
-  m_RootOrder: 5
+  m_Father: {fileID: 57373878}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 152.8}
-  m_SizeDelta: {x: 0, y: 305.6}
+  m_AnchoredPosition: {x: 0, y: -27.284546}
+  m_SizeDelta: {x: 0, y: -54.569183}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &108907825
 MonoBehaviour:
@@ -1753,6 +1756,7 @@ MonoBehaviour:
   visual: {fileID: 304595267}
   inMazeCommands:
   - {fileID: 7586522822110775013, guid: cc2e8260a2e4d2548919dd92aae3a745, type: 3}
+  - {fileID: 7582071581260663903, guid: f7af8960c5c57d44f884d05dad34b413, type: 3}
   - {fileID: 1832028788796949478, guid: 638d3570b42e959438e6d5b6ba99b0a8, type: 3}
   inRoomCommands:
   - {fileID: 4141516093626292071, guid: 5cc508a95399fbd42b9045658f65dcb2, type: 3}
@@ -1875,7 +1879,6 @@ RectTransform:
   - {fileID: 1731023181}
   - {fileID: 1796355467}
   - {fileID: 115745451}
-  - {fileID: 108907824}
   m_Father: {fileID: 57373878}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4702,6 +4705,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2082723743}
   m_CullTransparentMesh: 0
+--- !u!1 &2130211253
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2130211255}
+  - component: {fileID: 2130211254}
+  m_Layer: 0
+  m_Name: TutorialContoller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2130211254
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130211253}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d349550824b8f448ae6df11005670cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waitTime: 5
+  pauseTime: 3
+--- !u!4 &2130211255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130211253}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2131670238
 GameObject:
   m_ObjectHideFlags: 0

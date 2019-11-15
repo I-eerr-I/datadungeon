@@ -12,6 +12,10 @@ public class GameManager : MonoBehaviour
     public GameObject         player;
     public UIManager          uiManager;
     public TerminalController terminal;
+    
+    [Header("Tutorial")]
+    public GameObject         tutorial;
+    public bool               isTutorial;
 
     public IDbConnection      dbConnection;
 
@@ -25,16 +29,10 @@ public class GameManager : MonoBehaviour
     const string   ROOMS_TABLENAME     = "rooms";
     const string   KEYS_TABLENAME      = "keys";
     const string   MONSTERS_TABLENAME  = "monsters";
-    // const string   INVENTORY_TABLENAME = "inventory";
-    // const string   STATUS_TABLENAME    = "status";
-    // const string   MYKEYS_TABLENAME    = "my_keys"; 
     const string   ROOM_TABLENAME      = "room";
     string[]       MAIN_TABLES         = {ROOMS_TABLENAME,    
                                           KEYS_TABLENAME, 
                                           MONSTERS_TABLENAME
-                                          //INVENTORY_TABLENAME, 
-                                          //STATUS_TABLENAME,   
-                                          //MYKEYS_TABLENAME
                                           };
     const string   MAZE_NAME           = "Maze.db";
     const string   ROOMS_TABLE         = @"
@@ -109,7 +107,11 @@ public class GameManager : MonoBehaviour
         terminal.SetPlayerController(player_controller);
         OpenConnection();
         command = dbConnection.CreateCommand();
-        SaveAndLoad();
+        if(!SaveAndLoad())
+        {
+            isTutorial = true;
+            tutorial.SetActive(true);
+        }
         GenerateMaze();
     }
 
@@ -145,20 +147,19 @@ public class GameManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        Quit();
+        FullQuit();
     }
 
-    void SaveAndLoad()
+    bool SaveAndLoad()
     {
         SaveData data = SaveSystem.Load();
         if(data == null) 
         {
             player_controller.SetStartCharacteristics();
+            return false;
         }
-        else
-        {
-            player_controller.SetCharacteristics(data);
-        }
+        player_controller.SetCharacteristics(data);
+        return true;
     }
 
     void GenerateMaze() 
@@ -436,8 +437,20 @@ public class GameManager : MonoBehaviour
         player_controller.IncrementVisionForRoom(room_name);
         return true;
     }
+
+    public void SkipTutorial()
+    {
+        isTutorial = false;
+        tutorial.SetActive(false);
+    }
     
     public void Quit()
+    {
+        dbConnection.Close();
+        SceneManager.LoadScene("Menu");
+    }
+
+    public void FullQuit()
     {
         dbConnection.Close();
         Application.Quit();

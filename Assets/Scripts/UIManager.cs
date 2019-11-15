@@ -47,6 +47,8 @@ public class UIManager : MonoBehaviour
     CommandController lastPressed = null;
     string            lastRequest = "";
 
+    Dictionary<string, bool> tutorialEvents = new Dictionary<string, bool>();
+
     PlayerController   player_controller;
     GameManager        gameManager;
     TerminalController terminal;
@@ -68,16 +70,16 @@ public class UIManager : MonoBehaviour
         terminal              = GameObject.FindWithTag("Terminal").GetComponent<TerminalController>();
         currentState          = GameState.InMaze;
         savedState            = currentState;
-        maxAmountOfCommands   = Mathf.Max(inMazeCommands.Length, inRoomCommands.Length, inFightCommands.Length); 
+        maxAmountOfCommands   = Mathf.Max(inMazeCommands.Length, inRoomCommands.Length, inFightCommands.Length);
+
+        tutorialEvents.Add("show_room_commands", false);
     }
 
     void Update()
     {
         if(Input.GetButtonDown("Cancel"))
         {
-            inputField.text  = "...";
-            lastPressed = null;
-            lastRequest = "";
+            ResetAll();
         }
         if(Input.GetButtonDown("Enter"))
         {
@@ -123,6 +125,10 @@ public class UIManager : MonoBehaviour
                         ExitMaze();
                         break;
 
+                        case CommandController.CommandType.SkipTutorial:
+                        SkipTutorial();
+                        break;
+
                     }
                     if(!lastPressed.commandType.Equals(CommandController.CommandType.Punch))
                     {
@@ -133,9 +139,7 @@ public class UIManager : MonoBehaviour
             }
             catch(SqliteException)
             {
-                lastPressed = null;
-                lastRequest = "";
-                inputField.text  = "...";
+                ResetAll();
             } 
         }
 
@@ -144,6 +148,21 @@ public class UIManager : MonoBehaviour
         UpdateCharacteristics();
         CheckAndSetUpdates();
         if(updateVisual) UpdateVisual();
+    }
+
+    public void ResetAll()
+    {
+        lastPressed = null;
+        lastRequest = "";
+        inputField.text  = "...";
+    }
+
+    public void SkipTutorial()
+    {
+        gameManager.SkipTutorial();
+        ExitRoom();
+        tutorialEvents["show_room_commands"] = true;
+        updateVisual = true;
     }
 
     public void ExitMaze()
@@ -250,6 +269,7 @@ public class UIManager : MonoBehaviour
         }
         if(usedItemType == PlayerController.UsedItemType.Trojan)
         {
+            visual.PlayDeadAnimation();
             terminal.ShowNewText("<color=#7777ff>The monster has been destroied.</color>");
             EnterTheRoom();
         }
@@ -359,6 +379,12 @@ public class UIManager : MonoBehaviour
         return lastPressed;
     }
 
+    public void AviableShowRoomCommands()
+    {
+        updateVisual = true;
+        tutorialEvents["show_room_commands"] = true;
+    }
+
     void CheckAndSetUpdates()
     {
         if(savedState != currentState)
@@ -396,6 +422,11 @@ public class UIManager : MonoBehaviour
         ClearCommands();
         foreach(GameObject command in commandsList)
         {
+            CommandController commandController = command.GetComponent<CommandController>();
+            if(commandController.commandType == CommandController.CommandType.SkipTutorial && !gameManager.isTutorial)
+                continue;
+            if(!tutorialEvents["show_room_commands"] && commandController.commandType == CommandController.CommandType.EnterTheRoom) 
+                continue;
             GameObject instantiatedCommand = Instantiate(command);
             instantiatedCommand.transform.SetParent(commands.transform);
         }
@@ -408,7 +439,6 @@ public class UIManager : MonoBehaviour
             Destroy(initedCommand.gameObject);
         }
     }
-
 
 
     void UpdateHealth()

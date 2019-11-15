@@ -45,7 +45,8 @@ public class TerminalController : MonoBehaviour
         dbCommand   = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().dbConnection.CreateCommand();
         uiManager   = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
-        StartGame();
+        if(!gameManager.isTutorial)
+            StartGame();
     }
 
     void Update()

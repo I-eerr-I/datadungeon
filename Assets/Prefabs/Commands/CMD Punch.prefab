@@ -227,6 +227,7 @@ MonoBehaviour:
   useRoomNameFormat: 1
   requestFor: secrete
   commandType: 3
+  isStandardCommand: 1
 --- !u!114 &245583039035203257
 MonoBehaviour:
   m_ObjectHideFlags: 0

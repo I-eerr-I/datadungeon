@@ -13,7 +13,7 @@ public class CommandController : MonoBehaviour
     public int    fontSize;
     public bool   useRoomNameFormat = false;
     public string requestFor;
-    public enum CommandType {EnterTheRoom, Attack, ExitRoom, Punch, RunAway, TakeItem, TakeKey, UseItem, Quit, ExitMaze}; 
+    public enum CommandType {EnterTheRoom, Attack, ExitRoom, Punch, RunAway, TakeItem, TakeKey, UseItem, Quit, ExitMaze, SkipTutorial}; 
     public CommandType commandType;
     public bool isStandardCommand = true;
 
@@ -32,6 +32,8 @@ public class CommandController : MonoBehaviour
             Text text = GetComponentInChildren<Text>();
             if(description.Length < 30)
                 text.text = description + "\t\t" + command;
+            else if(description.Length < 3)
+                text.text = description + "\t\t\t" + command;
             else
                 text.text = description + "\t" + command;
             text.fontSize = fontSize;
