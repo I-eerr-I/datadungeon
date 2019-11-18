@@ -4717,7 +4717,7 @@ GameObject:
   - component: {fileID: 2130211254}
   m_Layer: 0
   m_Name: TutorialContoller
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4736,6 +4736,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waitTime: 5
   pauseTime: 3
+  startTime: 1
 --- !u!4 &2130211255
 Transform:
   m_ObjectHideFlags: 0

@@ -244,7 +244,7 @@ public class PlayerController : MonoBehaviour
         }
         else if(item_type.Equals("worm") && wormsAmount > 0)
         {
-            if(gameManager.ExpandMonsterSecrete(uiManager.GetCurrentMonsterID()))
+            if(gameManager.ExpandMonsterSecret(uiManager.GetCurrentMonsterID()))
             {
                 wormsAmount--;
                 return UsedItemType.Worm;

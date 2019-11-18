@@ -48,6 +48,7 @@ public class UIManager : MonoBehaviour
     string            lastRequest = "";
 
     Dictionary<string, bool> tutorialEvents = new Dictionary<string, bool>();
+    long waitForSecret = -1;
 
     PlayerController   player_controller;
     GameManager        gameManager;
@@ -62,7 +63,7 @@ public class UIManager : MonoBehaviour
     string currentKeyID          = "";
     string currentItemType       = "";
     string currentItemID         = "";
-    string currentUseItemType   = ""; 
+    string currentUseItemType    = ""; 
 
     void Start()
     {
@@ -73,6 +74,10 @@ public class UIManager : MonoBehaviour
         maxAmountOfCommands   = Mathf.Max(inMazeCommands.Length, inRoomCommands.Length, inFightCommands.Length);
 
         tutorialEvents.Add("show_room_commands", false);
+        tutorialEvents.Add("entered_the_room", false);
+        tutorialEvents.Add("attacked_monster", false);
+        tutorialEvents.Add("punched_monster", false);
+        tutorialEvents.Add("used_trojan", false);
     }
 
     void Update()
@@ -173,6 +178,7 @@ public class UIManager : MonoBehaviour
 
     public void EnterTheRoom()
     {
+        if(gameManager.isTutorial) tutorialEvents["entered_the_room"] = true;
         if(!gameManager.IsTheRoomLocked(currentRoom))
         {
             currentMonstersAmount = gameManager.CountMonstersInRoom(currentRoom);
@@ -203,6 +209,11 @@ public class UIManager : MonoBehaviour
                 EnterTheRoom();
             }
         }
+    }
+
+    public bool GetEnteredTheRoom()
+    {
+        return tutorialEvents["entered_the_room"];
     }
 
     public void TakeKey()
@@ -252,12 +263,19 @@ public class UIManager : MonoBehaviour
 
     public void Attack()
     {
+        if(gameManager.isTutorial) tutorialEvents["attacked_monster"] = true;
         currentState = GameState.InFight;
         terminal.ShowNewTextLoading("Started monster destroying process.\n");
     }
 
+    public bool GetAttackedMonster()
+    {
+        return tutorialEvents["attacked_monster"];
+    }
+
     public void UseItem()
     {
+        if(gameManager.isTutorial && currentUseItemType.Equals("trojan")) tutorialEvents["used_trojan"];
         PlayerController.UsedItemType usedItemType = player_controller.UseItem(currentUseItemType, currentRoom);
         if(usedItemType == PlayerController.UsedItemType.Nothing)
         {
@@ -280,9 +298,21 @@ public class UIManager : MonoBehaviour
         currentUseItemType = "";
     }
 
+    public bool GetUsedTrojan()
+    {
+        return tutorialEvents["used_trojan"];
+    }
+
     public void Punch()
     {
         bool is_lower;
+        if(gameManager.isTutorial) 
+        {
+            if(currentSecrete.Equals((int)waitForSecret))
+                tutorialEvents["punched_monster"] = true;
+            else
+                terminal.ShowNewText("Believe me - enter <color=#ff7>"+waitForSecret.ToString()+"</color>");
+        }
         if(gameManager.PunchMonster(currentMonsterID, currentRoom, currentSecrete, out is_lower))
         {
             visual.PlayDeadAnimation();
@@ -302,6 +332,16 @@ public class UIManager : MonoBehaviour
             }
         }
         currentSecrete = -1;
+    }
+
+    public void SetWaitForSecret(long secret)
+    {
+        waitForSecret = secret;
+    }
+
+    public bool GetPunchedMonster()
+    {
+        return tutorialEvents["punched_monster"];
     }
 
     public void RunAway()

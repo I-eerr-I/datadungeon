@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 213378081950153489}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -44,7 +44,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   level: 10
+  health: 0
   levelPoints: 0
   depthOfVision: 2
   maxHealth: 5
   luck: 0.2
+  keysAmount: 0
+  bugsAmount: 0
+  trojansAmount: 0
+  wormsAmount: 0

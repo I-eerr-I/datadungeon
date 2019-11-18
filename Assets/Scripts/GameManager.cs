@@ -44,8 +44,8 @@ public class GameManager : MonoBehaviour
     room_name VARCHAR(45))";
     const string   MONSTERS_TABLE      = @"
     (id INTEGER PRIMARY KEY,
-    max_secrete INTEGER NOT NULL,
-    min_secrete INTEGER NOT NULL)"; 
+    max_secret INTEGER NOT NULL,
+    min_secret INTEGER NOT NULL)"; 
     const string   ROOM_TABLE          = @"
     (id INTEGER PRIMARY KEY,
     name VARCHAR(45) NOT NULL,
@@ -69,13 +69,13 @@ public class GameManager : MonoBehaviour
     const int    MAX_MONSTERS_AMOUNT         = 2;
     const int    MIDDLE_MONSTER_LEVEL        = 2;
     const int    HARD_MONSTER_LEVEL          = 4;
-    const int    MAX_SECRETE_NUMBER          = 100;
-    const int    EASY_MIN_SECRETE_DISTANCE   = 40; 
-    const int    EASY_MAX_SECRETE_DISTANCE   = 50;
-    const int    MIDDLE_MIN_SECRETE_DISTANCE = 30;
-    const int    MIDDLE_MAX_SECRETE_DISTANCE = 40;
-    const int    HARD_MIN_SECRETE_DISTANCE   = 20;
-    const int    HARD_MAX_SECRETE_DISTANCE   = 30; 
+    const int    MAX_SECRET_NUMBER          = 100;
+    const int    EASY_MIN_SECRET_DISTANCE   = 40; 
+    const int    EASY_MAX_SECRET_DISTANCE   = 50;
+    const int    MIDDLE_MIN_SECRET_DISTANCE = 30;
+    const int    MIDDLE_MAX_SECRET_DISTANCE = 40;
+    const int    HARD_MIN_SECRET_DISTANCE   = 20;
+    const int    HARD_MAX_SECRET_DISTANCE   = 30; 
     const float  EASY_MONSTER_CHANCE         = 1f;
     const float  MIDDLE_MONSTER_CHANCE       = 0.5f;
     const float  HADR_MONSTER_CHANCE         = 0.25f;
@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviour
         player_controller = player.GetComponent<PlayerController>();
         uiManager.SetPlayerController(player_controller);
         terminal.SetPlayerController(player_controller);
+        tutorial.GetComponent<TutorialController>().SetPlayerController(player_controller);
         OpenConnection();
         command = dbConnection.CreateCommand();
         if(!SaveAndLoad())
@@ -214,31 +215,31 @@ public class GameManager : MonoBehaviour
         max_level_points += monsters_amount*player_controller.level*10;
         for(int m = 0; m < monsters_amount; m++)
         {
-            command.CommandText  = "INSERT INTO "+MONSTERS_TABLENAME+"(id, min_secrete, max_secrete) VALUES (" + monster_id.ToString() + ", ";
+            command.CommandText  = "INSERT INTO "+MONSTERS_TABLENAME+"(id, min_secret, max_secret) VALUES (" + monster_id.ToString() + ", ";
             float monster_chance = Random.Range(0f, 1f)*(1-player_controller.luck);
-            int[] secrete_range  = {};
+            int[] secret_range  = {};
             string monster_name  = "";
             if(monster_chance <= EASY_MONSTER_CHANCE && monster_chance > MIDDLE_MONSTER_CHANCE)
             {
-                secrete_range = GetSecreteRange(EASY_MIN_SECRETE_DISTANCE, EASY_MAX_SECRETE_DISTANCE);
+                secret_range = GetSecretRange(EASY_MIN_SECRET_DISTANCE, EASY_MAX_SECRET_DISTANCE);
                 monster_name  = GetHashedName(EASY_MONSTER_NAME, monster_id);
             }
             else if(monster_chance < MIDDLE_MONSTER_CHANCE && monster_chance >= HADR_MONSTER_CHANCE && MIDDLE_MONSTER_LEVEL <= player_controller.level)
             {
-                secrete_range = GetSecreteRange(MIDDLE_MIN_SECRETE_DISTANCE, MIDDLE_MAX_SECRETE_DISTANCE);
+                secret_range = GetSecretRange(MIDDLE_MIN_SECRET_DISTANCE, MIDDLE_MAX_SECRET_DISTANCE);
                 monster_name  = GetHashedName(MIDDLE_MONSTER_NAME, monster_id);
             }
             else if(monster_chance < HADR_MONSTER_CHANCE && HARD_MONSTER_LEVEL <= player_controller.level)
             {
-                secrete_range = GetSecreteRange(HARD_MIN_SECRETE_DISTANCE, HARD_MAX_SECRETE_DISTANCE);
+                secret_range = GetSecretRange(HARD_MIN_SECRET_DISTANCE, HARD_MAX_SECRET_DISTANCE);
                 monster_name  = GetHashedName(HARD_MONSTER_NAME, monster_id);
             }
             if(monster_name == "") 
             {
                 monster_name  = GetHashedName(EASY_MONSTER_NAME, monster_id);
-                secrete_range = GetSecreteRange(EASY_MIN_SECRETE_DISTANCE, EASY_MAX_SECRETE_DISTANCE);
+                secret_range = GetSecretRange(EASY_MIN_SECRET_DISTANCE, EASY_MAX_SECRET_DISTANCE);
             }
-            command.CommandText += secrete_range[0].ToString() + ", " + secrete_range[1].ToString() + ")";
+            command.CommandText += secret_range[0].ToString() + ", " + secret_range[1].ToString() + ")";
             command.ExecuteNonQuery();
             command.CommandText = "INSERT INTO " + room_name + "(name, type, monster_id) VALUES('" + monster_name + "', '"+MONSTER_TYPENAME+"', " + monster_id.ToString() + ")";
             command.ExecuteNonQuery();
@@ -328,12 +329,12 @@ public class GameManager : MonoBehaviour
         return name+"_"+Mathf.Abs((name+id.ToString()).GetHashCode()).ToString();
     }
 
-    int[] GetSecreteRange(int min_secrete_distance, int max_secrete_distance)
+    int[] GetSecretRange(int min_secret_distance, int max_secret_distance)
     {
-        int secrete_distance = Random.Range(min_secrete_distance, max_secrete_distance);
-        int min_secrete      = Random.Range(0, MAX_SECRETE_NUMBER-secrete_distance);
-        int max_secrete      = min_secrete+secrete_distance;
-        int[] result = {min_secrete, max_secrete};
+        int secret_distance = Random.Range(min_secret_distance, max_secret_distance);
+        int min_secret      = Random.Range(0, MAX_SECRET_NUMBER-secret_distance);
+        int max_secret      = min_secret+secret_distance;
+        int[] result = {min_secret, max_secret};
         return result;
     }
 
@@ -360,10 +361,10 @@ public class GameManager : MonoBehaviour
         return (blocked == 1)? true : false; 
     }
 
-    public bool PunchMonster(string monster_id, string room_name, int secrete, out bool is_lower)
+    public bool PunchMonster(string monster_id, string room_name, int secret, out bool is_lower)
     {
         player_controller.AttackAnimation();
-        command.CommandText = "SELECT min_secrete, max_secrete FROM monsters WHERE id = "+monster_id;
+        command.CommandText = "SELECT min_secret, max_secret FROM monsters WHERE id = "+monster_id;
         IDataReader reader  = command.ExecuteReader();
         bool is_punched = false;
         is_lower        = false;
@@ -371,15 +372,15 @@ public class GameManager : MonoBehaviour
         {
             long minimum = reader.GetInt64(0);
             long maximum = reader.GetInt64(1);
-            if(secrete < minimum)
+            if(secret < minimum)
             {
                 is_lower = false;
             }
-            else if(secrete > maximum)
+            else if(secret > maximum)
             {
                 is_lower = true;
             }
-            if(secrete >= minimum && secrete <= maximum)
+            if(secret >= minimum && secret <= maximum)
             {
                 is_punched = true;
             }
@@ -399,6 +400,28 @@ public class GameManager : MonoBehaviour
         return is_punched;
     }
 
+    public long GetSecretMaximum(string monster_id)
+    {
+        IDbCommand command  = dbConnection.CreateCommand();
+        command.CommandText = "SELECT max_secret FROM monsters WHERE id = "+monster_id;   
+        IDataReader reader  = command.ExecuteReader();
+        reader.Read();
+        long maximum = reader.GetInt64(0);
+        return maximum;
+        reader.Close();
+    }
+
+    public long GetSecretMinimum(string monster_id)
+    {
+        IDbCommand command  = dbConnection.CreateCommand();
+        command.CommandText = "SELECT min_secret FROM monsters WHERE id = "+monster_id;   
+        IDataReader reader  = command.ExecuteReader();
+        reader.Read();
+        long maximum = reader.GetInt64(0);
+        return maximum;
+        reader.Close();
+    }
+
     public string GetMonsterID(string room_monster_id, string room_name)
     {
         command.CommandText = "SELECT monster_id FROM "+room_name+" WHERE id = "+room_monster_id;
@@ -409,19 +432,19 @@ public class GameManager : MonoBehaviour
         return monster_id;
     }
 
-    public bool ExpandMonsterSecrete(string monster_id)
+    public bool ExpandMonsterSecret(string monster_id)
     {
-        command.CommandText = "SELECT min_secrete, max_secrete FROM monsters WHERE id = "+monster_id;
+        command.CommandText = "SELECT min_secret, max_secret FROM monsters WHERE id = "+monster_id;
         IDataReader reader  = command.ExecuteReader();
         if(!reader.Read()) return false;
-        long min_secrete = reader.GetInt64(0);
-        long max_secrete = reader.GetInt64(1);
+        long min_secret = reader.GetInt64(0);
+        long max_secret = reader.GetInt64(1);
         reader.Close();
-        min_secrete = (long)((float)min_secrete - 0.25f*(float)min_secrete);
-        max_secrete = (long)((float)max_secrete + 0.25*(float)max_secrete);
-        if(min_secrete < 0) min_secrete = 0;
-        if(max_secrete > MAX_SECRETE_NUMBER) max_secrete = MAX_SECRETE_NUMBER;
-        command.CommandText = "UPDATE monsters SET min_secrete = "+min_secrete+", max_secrete = "+max_secrete+" WHERE id = "+monster_id;
+        min_secret = (long)((float)min_secret - 0.25f*(float)min_secret);
+        max_secret = (long)((float)max_secret + 0.25*(float)max_secret);
+        if(min_secret < 0) min_secret = 0;
+        if(max_secret > MAX_SECRET_NUMBER) max_secret = MAX_SECRET_NUMBER;
+        command.CommandText = "UPDATE monsters SET min_secret = "+min_secret+", max_secret = "+max_secret+" WHERE id = "+monster_id;
         command.ExecuteNonQuery();
         return true;
     }
