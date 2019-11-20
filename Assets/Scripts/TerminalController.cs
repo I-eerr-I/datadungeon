@@ -107,7 +107,7 @@ public class TerminalController : MonoBehaviour
             switch(i)
             {
                 case 0:
-                text.text = "<color=#000000>Upgrade Depth Of Vision</color>";
+                text.text = "<color=#fff>Upgrade Depth Of Vision</color>";
                 rowButton.onClick.AddListener(rowButton.gameObject.GetComponent<ButtonFunctions>().UpgradeDOV);
                 break;
 
@@ -222,6 +222,9 @@ public class TerminalController : MonoBehaviour
     public void ShowNewTextInput(string text)
     {
         GameObject gameNewTextInput = InitObjectInContent(defaultTextInput);
+        InputField field = gameNewTextInput.GetComponentInChildren<InputField>();
+        field.Select();
+        field.ActivateInputField();
         Text newText = gameNewTextInput.GetComponentInChildren<Text>();
         newText.text = text;
     }

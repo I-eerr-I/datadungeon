@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SaveSystem : MonoBehaviour
 {
-    public static void Save(PlayerController playerController)
+    public static bool Save(PlayerController playerController)
     {
         BinaryFormatter formatter = new BinaryFormatter();
         string path = Application.persistentDataPath + "/save";
@@ -12,6 +12,7 @@ public class SaveSystem : MonoBehaviour
         SaveData data = new SaveData(playerController);
         formatter.Serialize(stream, data);
         stream.Close();
+        return true;
     }
 
     public static SaveData Load()

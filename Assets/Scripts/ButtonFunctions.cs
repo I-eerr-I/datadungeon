@@ -58,6 +58,7 @@ public class ButtonFunctions : MonoBehaviour
     {
         if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_ROOMNAME))
         {
+            AlertAboutEnter();
             string roomName = GetComponentInChildren<Text>().text;
             uiManager.GetLastPressed().TakeRequest(roomName);
             uiManager.SetRoomName(roomName); 
@@ -68,6 +69,7 @@ public class ButtonFunctions : MonoBehaviour
     {
         if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_MONSTERID))
         {
+            AlertAboutEnter();
             foreach(Transform column in transform)
             {
                 if(column.gameObject.name.Equals("ID"))
@@ -85,6 +87,7 @@ public class ButtonFunctions : MonoBehaviour
     {
         if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_KEYID))
         {
+            AlertAboutEnter();
             foreach(Transform column in transform)
             {
                 if(column.gameObject.name.Equals("ID"))
@@ -102,6 +105,7 @@ public class ButtonFunctions : MonoBehaviour
     {
         if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_ITEMTYPE))
         {
+            AlertAboutEnter();
             string item_type = ""; 
             string item_id   = "";
             foreach(Transform column in transform)
@@ -125,6 +129,7 @@ public class ButtonFunctions : MonoBehaviour
         if(uiManager.GetLastRequest().Equals(UIManager.REQUEST_ITEMTYPE) && 
            uiManager.GetLastPressed().commandType.Equals(CommandController.CommandType.UseItem))
         {
+            AlertAboutEnter();
             InitTakeItemType(gameObject.tag);
         }
     }
@@ -133,5 +138,10 @@ public class ButtonFunctions : MonoBehaviour
     {
         uiManager.GetLastPressed().TakeRequest(item_type);
         uiManager.SetCurrentUseItemType(item_type);
+    }
+
+    void AlertAboutEnter()
+    {
+        terminal.ShowNewText("Press <color=#fff>ENTER</color> to submit");
     }
 }

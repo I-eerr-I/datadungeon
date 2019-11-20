@@ -98,6 +98,7 @@ public class GameManager : MonoBehaviour
     bool game_over       = false;
     bool ended_game      = false;
     bool wait_for_enter  = false;
+    bool miss_next       = false;
 
     void Awake()
     {
@@ -348,6 +349,11 @@ public class GameManager : MonoBehaviour
         return result;
     }
 
+    public void SetMonsterMissNext()
+    {
+        miss_next = true;
+    }
+
     public bool IsTheRoomLocked(string roomName)
     {
         command.CommandText = "SELECT locked FROM rooms WHERE name = '"+roomName+"'";
@@ -364,10 +370,10 @@ public class GameManager : MonoBehaviour
     public bool PunchMonster(string monster_id, string room_name, int secret, out bool is_lower)
     {
         player_controller.AttackAnimation();
-        command.CommandText = "SELECT min_secret, max_secret FROM monsters WHERE id = "+monster_id;
-        IDataReader reader  = command.ExecuteReader();
         bool is_punched = false;
         is_lower        = false;
+        command.CommandText = "SELECT min_secret, max_secret FROM monsters WHERE id = "+monster_id;
+        IDataReader reader  = command.ExecuteReader();
         while(reader.Read())
         {
             long minimum = reader.GetInt64(0);
@@ -386,6 +392,13 @@ public class GameManager : MonoBehaviour
             }
         }
         reader.Close();
+        if(miss_next)
+        {
+            miss_next  = false;
+            is_punched = false;
+            uiManager.MonsterMissed();
+            return is_punched;
+        }
         if(is_punched)
         {
             DeleteMonster(monster_id, room_name);
@@ -502,7 +515,7 @@ public class GameManager : MonoBehaviour
     public void Upgrade(UPGRADABLE upgrade_type)
     {
         player_controller.Upgrade(upgrade_type);
-        SaveSystem.Save(player_controller);
+        while(!SaveSystem.Save(player_controller)) {};
         Reload();
     }
 

@@ -49,6 +49,7 @@ public class UIManager : MonoBehaviour
 
     Dictionary<string, bool> tutorialEvents = new Dictionary<string, bool>();
     long waitForSecret = -1;
+    public bool show_room_commands = false;
 
     PlayerController   player_controller;
     GameManager        gameManager;
@@ -73,15 +74,19 @@ public class UIManager : MonoBehaviour
         savedState            = currentState;
         maxAmountOfCommands   = Mathf.Max(inMazeCommands.Length, inRoomCommands.Length, inFightCommands.Length);
 
-        tutorialEvents.Add("show_room_commands", false);
+        tutorialEvents.Add("show_room_commands", show_room_commands);
         tutorialEvents.Add("entered_the_room", false);
         tutorialEvents.Add("attacked_monster", false);
         tutorialEvents.Add("punched_monster", false);
-        tutorialEvents.Add("used_trojan", false);
+        tutorialEvents.Add("used_bug", false);
     }
 
     void Update()
     {
+        if(Input.GetKeyDown("space"))
+        {
+            terminal.ShowRoomsLoading();
+        }
         if(Input.GetButtonDown("Cancel"))
         {
             ResetAll();
@@ -275,7 +280,7 @@ public class UIManager : MonoBehaviour
 
     public void UseItem()
     {
-        if(gameManager.isTutorial && currentUseItemType.Equals("trojan")) tutorialEvents["used_trojan"];
+        if(gameManager.isTutorial && currentUseItemType.Equals("bug")) tutorialEvents["used_bug"] = true;
         PlayerController.UsedItemType usedItemType = player_controller.UseItem(currentUseItemType, currentRoom);
         if(usedItemType == PlayerController.UsedItemType.Nothing)
         {
@@ -298,9 +303,9 @@ public class UIManager : MonoBehaviour
         currentUseItemType = "";
     }
 
-    public bool GetUsedTrojan()
+    public bool GetUsedBug()
     {
-        return tutorialEvents["used_trojan"];
+        return tutorialEvents["used_bug"];
     }
 
     public void Punch()
@@ -311,7 +316,11 @@ public class UIManager : MonoBehaviour
             if(currentSecrete.Equals((int)waitForSecret))
                 tutorialEvents["punched_monster"] = true;
             else
-                terminal.ShowNewText("Believe me - enter <color=#ff7>"+waitForSecret.ToString()+"</color>");
+            {
+                terminal.ShowNewText("Believe me - enter <color=#fff>"+waitForSecret.ToString()+"</color>");
+                return;
+            }
+
         }
         if(gameManager.PunchMonster(currentMonsterID, currentRoom, currentSecrete, out is_lower))
         {
@@ -341,7 +350,9 @@ public class UIManager : MonoBehaviour
 
     public bool GetPunchedMonster()
     {
-        return tutorialEvents["punched_monster"];
+        bool punched = tutorialEvents["punched_monster"];
+        tutorialEvents["punched_monster"] = false;
+        return punched;
     }
 
     public void RunAway()
@@ -496,7 +507,7 @@ public class UIManager : MonoBehaviour
 
     void UpdateCharacteristics()
     {
-        level.text         = "---\tLevel:\t" + player_controller.level.ToString() + "\t---";
+        level.text         = "---\tLEVEL:\t" + player_controller.level.ToString() + "\t---";
         depthOfVision.text = player_controller.depthOfVision.ToString();
         maxHealth.text     = player_controller.maxHealth.ToString();
         luck.text          = player_controller.luck.ToString();
