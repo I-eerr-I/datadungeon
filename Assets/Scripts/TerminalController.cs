@@ -53,28 +53,7 @@ public class TerminalController : MonoBehaviour
     {
         if(showStatistics)
         {
-            float animation_speed = 0.1f;
-            coroutines.Add(show_counting_text("<color=#ff7777>Killed monsters:\t {0}</color>", monster_killed, 1, animation_speed));
-            coroutines.Add(show_counting_text("<color=#ffff77>Cleared rooms:\t\t {0}</color>", playerController.GetCleanedRoomsAmount(), 1, animation_speed));
-            coroutines.Add(show_counting_text("<color=#7777ff>Points:\t\t\t\t {0}</color>", playerController.levelPoints, 10, animation_speed));
-            coroutines.Add(show_counting_text("<color=#aaaaff>Maze points: \t\t{0}</color>", gameManager.GetMaxLevelPoints(), 10, animation_speed));
-            float clearedPercentes = (float)playerController.levelPoints/(float)gameManager.GetMaxLevelPoints() * 100;
-            coroutines.Add(show_new_text(String.Format("<color=#77ffff>Cleared {0}% of maze</color>", clearedPercentes)));
-            int level_points_diff = playerController.levelPoints - playerController.GetMaxLevelPoints();
-            if(level_points_diff > 0)
-            {
-                coroutines.Add(show_new_text("Level upgrade: TRUE"));
-                coroutines.Add(show_upgradable());
-            }
-            else
-            {
-                coroutines.Add(show_new_text("<color=#ff7777>Level upgrade: FALSE</color>"));
-                coroutines.Add(show_counting_text("To new level: {0}", Mathf.Abs(level_points_diff), 10, animation_speed));
-                coroutines.Add(show_new_text("<color=#ffffff>Press Enter to continue...</color>"));
-                gameManager.ActivateWaitForEnterToEnd();
-            }
-            
-            showStatistics = false;
+            ShowFullStatistics();
         }
         if(coroutines.Count > 0)
         {
@@ -87,6 +66,49 @@ public class TerminalController : MonoBehaviour
                     break;
                 }
             }
+        }
+    }
+
+    public void ShowFullStatistics()
+    {
+        float animation_speed = 0.1f;
+        coroutines.Add(show_counting_text("<color=#ff5555>Killed monsters:\t {0}</color>", monster_killed, 1, animation_speed));
+        coroutines.Add(show_counting_text("<color=#ffff55>Cleared rooms:\t\t {0}</color>", playerController.GetCleanedRoomsAmount(), 1, animation_speed));
+        coroutines.Add(show_counting_text("<color=#5555ff>Points:\t\t\t\t {0}</color>", playerController.levelPoints, 10, animation_speed));
+        coroutines.Add(show_counting_text("<color=#aaaaff>Maze points:\t\t{0}</color>", gameManager.GetMaxLevelPoints(), 10, animation_speed));
+        float clearedPercentes = (float)playerController.levelPoints/(float)gameManager.GetMaxLevelPoints() * 100;
+        coroutines.Add(show_new_text(String.Format("<color=#55ffff>Cleared {0}% of maze</color>", clearedPercentes)));
+        int level_points_diff = playerController.levelPoints - playerController.GetMaxLevelPoints();
+        if(level_points_diff > 0)
+        {
+            coroutines.Add(show_new_text("Level upgrade: TRUE"));
+            coroutines.Add(show_upgradable());
+        }
+        else
+        {
+            coroutines.Add(show_new_text("<color=#ff5555>Level upgrade: FALSE</color>"));
+            coroutines.Add(show_counting_text("To new level: {0}", Mathf.Abs(level_points_diff), 10, animation_speed));
+            coroutines.Add(show_new_text("<color=#ffffff>Press Enter to continue...</color>"));
+            gameManager.ActivateWaitForEnterToEnd();
+        }
+        
+        showStatistics = false;
+    }
+
+    public void ShowShortStatistics()
+    {
+        ShowNewText("<color=#f55>Killed monsters:\t"+monster_killed.ToString()+"</color>");
+        ShowNewText("<color=#ff5>Cleared rooms:\t\t"+playerController.GetCleanedRoomsAmount().ToString()+"</color>");
+        ShowNewText("<color=#5555ff>Points:\t\t\t\t"+playerController.levelPoints.ToString()+"</color>");
+        int level_points_diff = playerController.levelPoints - playerController.GetMaxLevelPoints();
+        if(level_points_diff > 0 )
+        {
+            ShowNewText("Upgrade: <color=#0f0>TRUE</color>");
+        }
+        else
+        {
+            ShowNewText("Upgrade: <color=#f55>FALSE</color>");
+            ShowNewText("<color=#ff5>To new level:</color><color=#fff>"+Mathf.Abs(level_points_diff).ToString()+" points</color>");
         }
     }
 
@@ -193,6 +215,7 @@ public class TerminalController : MonoBehaviour
                     commandController.command           = "CALL EXIT_MAZE()";
                     commandController.commandType       = CommandController.CommandType.ExitMaze;
                     gameRoomRowButton.onClick.AddListener(gameRoomRowButton.GetComponent<ButtonFunctions>().ToCommandLine);
+                    gameRoomRowButton.onClick.AddListener(ShowShortStatistics);
                 }
             }
             if(column.gameObject.name.Equals("TYPE"))

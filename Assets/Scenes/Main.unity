@@ -658,6 +658,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectDescription: AI-monster-destroyer
   objectImage: {fileID: 21300000, guid: db605dad6ef51d34d94864d2784afcd9, type: 3}
+  levelDependent: 0
+  gameManagerConstant: 0
+  constant: 
+  level: 0
+  spriteImage: {fileID: 0}
+  lowLevelSprite: {fileID: 0}
+  textObject: {fileID: 0}
+  lowLevelText: 
 --- !u!114 &115745455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -748,10 +756,10 @@ RectTransform:
   - {fileID: 1278148933}
   - {fileID: 764830310}
   m_Father: {fileID: 1796355467}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.75, y: 0}
-  m_AnchorMax: {x: 0.99, y: 0.8}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.74, y: 0.8}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -883,6 +891,14 @@ MonoBehaviour:
   objectDescription: It the monster is too hard, or your health is too low, you can
     use worm to expand monster's secrete!
   objectImage: {fileID: 21300000, guid: 2e5f6089bcf29134ba2848e1618178ae, type: 3}
+  levelDependent: 1
+  gameManagerConstant: 1
+  constant: worm
+  level: 0
+  spriteImage: {fileID: 1278148934}
+  lowLevelSprite: {fileID: 21300000, guid: 6448f01e25520884881abe79952a8dd5, type: 3}
+  textObject: {fileID: 887581053}
+  lowLevelText: NOT AVIABLE
 --- !u!1 &165070201
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,7 +949,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.5764706, b: 0.12156863, a: 1}
+  m_Color: {r: 1, g: 0.6666667, b: 0, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -951,7 +967,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: <color=#FA0>BUGS</color>
+  m_Text: BUGS
 --- !u!222 &165070204
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1548,6 +1564,14 @@ MonoBehaviour:
   objectDescription: This little beatles of the code can restore your health. Just
     use them in you monster fight.
   objectImage: {fileID: 21300000, guid: b12b10c7d2d72964191b8f373054b731, type: 3}
+  levelDependent: 0
+  gameManagerConstant: 0
+  constant: 
+  level: 0
+  spriteImage: {fileID: 0}
+  lowLevelSprite: {fileID: 0}
+  textObject: {fileID: 0}
+  lowLevelText: 
 --- !u!1 &447119699
 GameObject:
   m_ObjectHideFlags: 0
@@ -2001,7 +2025,7 @@ MonoBehaviour:
   - {fileID: 8304934592675184648, guid: b74708d0c832dfc48be3adf3751d6cb8, type: 3}
   - {fileID: 8973162923958242534, guid: cdf543a894275a94e82c740c38036715, type: 3}
   currentState: 0
-  show_room_commands: 0
+  show_room_commands: 1
 --- !u!1 &651704876
 GameObject:
   m_ObjectHideFlags: 0
@@ -2521,7 +2545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.5764706, b: 0.12156863, a: 1}
+  m_Color: {r: 1, g: 0.46666667, b: 1, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -2539,7 +2563,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: <color=#F7F>WORMS</color>
+  m_Text: WORMS
 --- !u!222 &887581054
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2694,6 +2718,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectDescription: The maximum amount of health points you can have.
   objectImage: {fileID: 21300000, guid: 903fd9cf373272b49b9846311303d644, type: 3}
+  levelDependent: 0
+  gameManagerConstant: 0
+  constant: 
+  level: 0
+  spriteImage: {fileID: 0}
+  lowLevelSprite: {fileID: 0}
+  textObject: {fileID: 0}
+  lowLevelText: 
 --- !u!1 &923519681
 GameObject:
   m_ObjectHideFlags: 0
@@ -2840,6 +2872,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectDescription: How knows? Maybe you are too lucky to be punched by monster??!
   objectImage: {fileID: 21300000, guid: b4ff18049d70fa04883ebd006180e3e1, type: 3}
+  levelDependent: 0
+  gameManagerConstant: 0
+  constant: 
+  level: 0
+  spriteImage: {fileID: 0}
+  lowLevelSprite: {fileID: 0}
+  textObject: {fileID: 0}
+  lowLevelText: 
 --- !u!1 &943199943
 GameObject:
   m_ObjectHideFlags: 0
@@ -3060,6 +3100,14 @@ MonoBehaviour:
   objectDescription: Use your keys to open locked doors. If you get one key, the locked
     door becomes open automaticly!!!
   objectImage: {fileID: 21300000, guid: f41e9b7b3f4dfd048b4e718e639396cf, type: 3}
+  levelDependent: 0
+  gameManagerConstant: 0
+  constant: 
+  level: 0
+  spriteImage: {fileID: 0}
+  lowLevelSprite: {fileID: 0}
+  textObject: {fileID: 0}
+  lowLevelText: 
 --- !u!1 &1088628334
 GameObject:
   m_ObjectHideFlags: 0
@@ -3110,7 +3158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.5764706, b: 0.12156863, a: 1}
+  m_Color: {r: 1, g: 1, b: 0.33333334, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -3128,7 +3176,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: <color=#FF5>KEYS</color>
+  m_Text: KEYS
 --- !u!222 &1088628337
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3483,7 +3531,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.5764706, b: 0.12156863, a: 1}
+  m_Color: {r: 1, g: 0.33333334, b: 0.33333334, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -3501,7 +3549,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: <color=#F55>TROJANS</color>
+  m_Text: TROJANS
 --- !u!222 &1332794647
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4335,8 +4383,8 @@ RectTransform:
   - {fileID: 67343856}
   - {fileID: 1034633653}
   - {fileID: 441263664}
-  - {fileID: 1827445095}
   - {fileID: 155173196}
+  - {fileID: 1827445095}
   m_Father: {fileID: 692074799}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4417,10 +4465,10 @@ RectTransform:
   - {fileID: 1355202939}
   - {fileID: 284370891}
   m_Father: {fileID: 1796355467}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.74, y: 0.8}
+  m_AnchorMin: {x: 0.75, y: 0}
+  m_AnchorMax: {x: 0.99, y: 0.8}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4552,6 +4600,14 @@ MonoBehaviour:
   objectDescription: Don't want to fight with monster? Destroy it immediatly with
     Trojan!
   objectImage: {fileID: 21300000, guid: 267f4fc9e10133548a90dad6d82d5d99, type: 3}
+  levelDependent: 1
+  gameManagerConstant: 1
+  constant: trojan
+  level: 0
+  spriteImage: {fileID: 1355202940}
+  lowLevelSprite: {fileID: 21300000, guid: 6448f01e25520884881abe79952a8dd5, type: 3}
+  textObject: {fileID: 1332794646}
+  lowLevelText: NOT AVIABLE
 --- !u!1 &1865193164
 GameObject:
   m_ObjectHideFlags: 0
@@ -4840,6 +4896,14 @@ MonoBehaviour:
   objectDescription: Deapth of Vision means how blind you are. The more deapth of
     vision you have, the more objects appears in front of you.
   objectImage: {fileID: 21300000, guid: 9f31742f61eccb742a88fe32f95454c0, type: 3}
+  levelDependent: 0
+  gameManagerConstant: 0
+  constant: 
+  level: 0
+  spriteImage: {fileID: 0}
+  lowLevelSprite: {fileID: 0}
+  textObject: {fileID: 0}
+  lowLevelText: 
 --- !u!1 &1942399605
 GameObject:
   m_ObjectHideFlags: 0
@@ -5362,7 +5426,7 @@ MonoBehaviour:
   waitTime: 5
   pauseTime: 3
   startTime: 1
-  tutorial_index: 1
+  tutorial_index: 3
 --- !u!4 &2130211255
 Transform:
   m_ObjectHideFlags: 0

@@ -67,8 +67,6 @@ public class GameManager : MonoBehaviour
     int          monster_id                  = 0;
     const int    MIN_MONSTERS_AMOUNT         = 1;
     const int    MAX_MONSTERS_AMOUNT         = 2;
-    const int    MIDDLE_MONSTER_LEVEL        = 2;
-    const int    HARD_MONSTER_LEVEL          = 4;
     const int    MAX_SECRET_NUMBER          = 100;
     const int    EASY_MIN_SECRET_DISTANCE   = 40; 
     const int    EASY_MAX_SECRET_DISTANCE   = 50;
@@ -93,6 +91,13 @@ public class GameManager : MonoBehaviour
     const string   BUG_TYPENAME     = "bug";
     string[]       ITEMS            = {WORM_TYPENAME, TROJAN_TYPENAME, BUG_TYPENAME};
 
+    // Features levels
+    public const int    WORM_LEVEL           = 3;
+    public const int    MIDDLE_MONSTER_LEVEL = 5;
+    public const int    TROJAN_LEVEL         = 7;
+    public const int    HARD_MONSTER_LEVEL   = 9;
+
+
     int monster_killed   = 0;
     int max_level_points = 0;
     bool game_over       = false;
@@ -115,6 +120,34 @@ public class GameManager : MonoBehaviour
             tutorial.SetActive(true);
         }
         GenerateMaze();
+    }
+
+    void Start()
+    {
+        if(player_controller.level == WORM_LEVEL)
+        {
+            terminal.ShowNewText("");
+            terminal.ShowNewText("<color=#f7f>WORMS</color> now aviable!");
+            terminal.ShowNewText("<color=#f7f>WORMS</color> expands mosters' secrets!");
+        }
+        if(player_controller.level == TROJAN_LEVEL)
+        {
+            terminal.ShowNewText("");
+            terminal.ShowNewText("Look for <color=#f55>TROJANS</color> in the maze!");
+            terminal.ShowNewText("Use <color=#f55>TROJAN</color> to destroy monsters permantly!");
+        }
+        if(player_controller.level == MIDDLE_MONSTER_LEVEL)
+        {
+            terminal.ShowNewText("");
+            terminal.ShowNewText("Mazes become more <color=#f55>DANGEROUS</color>!");
+            terminal.ShowNewText("<color=#f55>MONSTERS</color> become harder now!");
+        }
+        if(player_controller.level == HARD_MONSTER_LEVEL)
+        {
+            terminal.ShowNewText("");
+            terminal.ShowNewText("<color=#f00>HARD MONSTERS?</color>");
+            terminal.ShowNewText("<color=#f00>OH GOD! OH GOD! OH GOD!</color>");
+        }
     }
 
     void Update()
@@ -256,9 +289,11 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < items_amount; i++)
         {
             int item_type = Random.Range(0, ITEMS.Length-1);
-            if(ITEMS[item_type] == WORM_TYPENAME) InsertItemIntoRoom(room_name, WORM_TYPENAME);
-            else if(ITEMS[item_type] == TROJAN_TYPENAME) InsertItemIntoRoom(room_name, TROJAN_TYPENAME);
-            else if(ITEMS[item_type] == BUG_TYPENAME) InsertItemIntoRoom(room_name, BUG_TYPENAME);
+            if(ITEMS[item_type] == WORM_TYPENAME && WORM_LEVEL >= player_controller.level) InsertItemIntoRoom(room_name, WORM_TYPENAME);
+            else if(ITEMS[item_type] == WORM_TYPENAME && WORM_LEVEL < player_controller.level) InsertItemIntoRoom(room_name, BUG_TYPENAME);
+            if(ITEMS[item_type] == TROJAN_TYPENAME && TROJAN_LEVEL >= player_controller.level) InsertItemIntoRoom(room_name, TROJAN_TYPENAME);
+            else if(ITEMS[item_type] == TROJAN_TYPENAME && TROJAN_LEVEL < player_controller.level) InsertItemIntoRoom(room_name, BUG_TYPENAME);
+            if(ITEMS[item_type] == BUG_TYPENAME) InsertItemIntoRoom(room_name, BUG_TYPENAME);
         }
     }
 
@@ -443,6 +478,11 @@ public class GameManager : MonoBehaviour
         string monster_id = reader.GetInt64(0).ToString();
         reader.Close();
         return monster_id;
+    }
+
+    public PlayerController GetPlayerController()
+    {
+        return player_controller;
     }
 
     public bool ExpandMonsterSecret(string monster_id)

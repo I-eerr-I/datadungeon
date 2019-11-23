@@ -50,6 +50,24 @@ public class UIManager : MonoBehaviour
     Dictionary<string, bool> tutorialEvents = new Dictionary<string, bool>();
     long waitForSecret = -1;
     public bool show_room_commands = false;
+    int annoy_me    = 0;
+    string[] annoying_dialog = {"<color=#fff>Believe me - enter", 
+                                "<color=#fee>Please, just enter ",
+                                "<color=#fdd>You gonna love it, enter", 
+                                "<color=#fcc>Come on! Just enter",
+                                "<color=#fbb>Are you kidding me? Enter", 
+                                "<color=#faa>Please! Dude, just enter",
+                                "<color=#f99>I'm not gonna stop... Enter", 
+                                "<color=#f88>Enter", 
+                                "<color=#f77>Enter", 
+                                "<color=#f66>Siriously? The secret is", 
+                                "<color=#f55>Stop it! Stop! Enter",
+                                "<color=#f44>I dare you, if you don't enter", 
+                                "<color=#f33>I gonna skip tutorial! Enter",
+                                "<color=#f22>Okay, that was funny. Now enter", 
+                                "<color=#f11>??? --->", 
+                                "<color=#ff0>01000101 01101110 01110100 01100101 01110010",
+                                "<color=#f00>BYE!"};
 
     PlayerController   player_controller;
     GameManager        gameManager;
@@ -85,7 +103,12 @@ public class UIManager : MonoBehaviour
     {
         if(Input.GetKeyDown("space"))
         {
-            terminal.ShowRoomsLoading();
+            if(currentState == GameState.InMaze)
+                terminal.ShowRoomsLoading();
+            if(currentState == GameState.InFight)
+                terminal.ShowNewTextLoading("You are in fight with <color=#f55>MONSTER</color>");
+            if(currentState == GameState.InRoom)
+                terminal.ShowRoom(currentRoom);
         }
         if(Input.GetButtonDown("Cancel"))
         {
@@ -167,6 +190,49 @@ public class UIManager : MonoBehaviour
         inputField.text  = "...";
     }
 
+    public void Punch()
+    {
+        bool is_lower;
+        if(gameManager.isTutorial) 
+        {
+            if(currentSecrete.Equals((int)waitForSecret))
+                tutorialEvents["punched_monster"] = true;
+            else
+            {
+                terminal.ShowNewText("");
+                if(annoy_me == annoying_dialog.Length-1)
+                {
+                    terminal.ShowNewText(annoying_dialog[annoy_me]+"</color>");
+                    SkipTutorial();
+                    return;
+                }
+                terminal.ShowNewText(annoying_dialog[annoy_me]+" "+waitForSecret.ToString()+"</color>");
+                annoy_me++;
+                return;
+            }
+
+        }
+        if(gameManager.PunchMonster(currentMonsterID, currentRoom, currentSecrete, out is_lower))
+        {
+            visual.PlayDeadAnimation();
+            terminal.ShowNewText("<color=#7777ff>Monster's been destroyed.</color>");
+            EnterTheRoom();
+        }
+        else
+        {
+            visual.PlayMonsterAttackAnimation();
+            if(is_lower)
+            {
+                terminal.ShowNewText("<color=#ff7777>The secrete is lower!</color>");
+            }
+            else
+            {
+                terminal.ShowNewText("<color=#ff7777>The secrete is higher!</color>");
+            }
+        }
+        currentSecrete = -1;
+    }
+
     public void SkipTutorial()
     {
         gameManager.SkipTutorial();
@@ -183,9 +249,9 @@ public class UIManager : MonoBehaviour
 
     public void EnterTheRoom()
     {
-        if(gameManager.isTutorial) tutorialEvents["entered_the_room"] = true;
         if(!gameManager.IsTheRoomLocked(currentRoom))
         {
+            if(gameManager.isTutorial) tutorialEvents["entered_the_room"] = true;
             currentMonstersAmount = gameManager.CountMonstersInRoom(currentRoom);
             currentState = GameState.InRoom;
             terminal.ShowNewTextLoading("You've opened the " + currentRoom);
@@ -306,41 +372,6 @@ public class UIManager : MonoBehaviour
     public bool GetUsedBug()
     {
         return tutorialEvents["used_bug"];
-    }
-
-    public void Punch()
-    {
-        bool is_lower;
-        if(gameManager.isTutorial) 
-        {
-            if(currentSecrete.Equals((int)waitForSecret))
-                tutorialEvents["punched_monster"] = true;
-            else
-            {
-                terminal.ShowNewText("Believe me - enter <color=#fff>"+waitForSecret.ToString()+"</color>");
-                return;
-            }
-
-        }
-        if(gameManager.PunchMonster(currentMonsterID, currentRoom, currentSecrete, out is_lower))
-        {
-            visual.PlayDeadAnimation();
-            terminal.ShowNewText("<color=#7777ff>Monster's been destroyed.</color>");
-            EnterTheRoom();
-        }
-        else
-        {
-            visual.PlayMonsterAttackAnimation();
-            if(is_lower)
-            {
-                terminal.ShowNewText("<color=#ff7777>The secrete is lower!</color>");
-            }
-            else
-            {
-                terminal.ShowNewText("<color=#ff7777>The secrete is higher!</color>");
-            }
-        }
-        currentSecrete = -1;
     }
 
     public void SetWaitForSecret(long secret)
