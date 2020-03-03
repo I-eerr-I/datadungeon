@@ -14,11 +14,16 @@ public class VisualAnimation : MonoBehaviour
 
     public float animationSpeed;
 
+    [Header("Sound")]
+    public AudioClip monsterAttackSound;
+
     Image image;
+    AudioSource audioSource;
 
     void Start()
     {
         image = GetComponent<Image>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void PlayDeadAnimation()
@@ -28,6 +33,8 @@ public class VisualAnimation : MonoBehaviour
 
     public void PlayMonsterAttackAnimation()
     {
+        audioSource.clip = monsterAttackSound;
+        audioSource.Play();
         StartCoroutine("monster_attack_animation");
     }
 

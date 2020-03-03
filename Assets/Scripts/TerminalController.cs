@@ -26,6 +26,9 @@ public class TerminalController : MonoBehaviour
     public Sprite keySprite;
     public Sprite monsterSprite;
 
+    [Header("Sound")]
+    public AudioClip messageSound;
+
     string[] loading    = {"|", "/", "-", "\\"};
     bool  is_loading    = false;
     string  room_name   = "";
@@ -35,6 +38,7 @@ public class TerminalController : MonoBehaviour
     int  monster_killed = 0;
     List<IEnumerator> coroutines = new List<IEnumerator>();
 
+    AudioSource audioSource;
     IDbCommand  dbCommand;
     UIManager   uiManager;
     GameManager gameManager;
@@ -45,6 +49,7 @@ public class TerminalController : MonoBehaviour
         dbCommand   = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().dbConnection.CreateCommand();
         uiManager   = GameObject.FindGameObjectWithTag("UIManager").GetComponent<UIManager>();
         gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        audioSource = GetComponent<AudioSource>();
         if(!gameManager.isTutorial)
             StartGame();
     }
@@ -77,7 +82,7 @@ public class TerminalController : MonoBehaviour
         coroutines.Add(show_counting_text("<color=#5555ff>Points:\t\t\t\t {0}</color>", playerController.levelPoints, 10, animation_speed));
         coroutines.Add(show_counting_text("<color=#aaaaff>Maze points:\t\t{0}</color>", gameManager.GetMaxLevelPoints(), 10, animation_speed));
         float clearedPercentes = (float)playerController.levelPoints/(float)gameManager.GetMaxLevelPoints() * 100;
-        coroutines.Add(show_new_text(String.Format("<color=#55ffff>Cleared {0}% of maze</color>", clearedPercentes)));
+        coroutines.Add(show_new_text(String.Format("<color=#55ffff>Cleared {0}% of maze</color>", clearedPercentes), false));
         int level_points_diff = playerController.levelPoints - playerController.GetMaxLevelPoints();
         if(level_points_diff > 0)
         {
@@ -86,9 +91,9 @@ public class TerminalController : MonoBehaviour
         }
         else
         {
-            coroutines.Add(show_new_text("<color=#ff5555>Level upgrade: FALSE</color>"));
+            coroutines.Add(show_new_text("<color=#ff5555>Level upgrade: FALSE</color>", false));
             coroutines.Add(show_counting_text("To new level: {0}", Mathf.Abs(level_points_diff), 10, animation_speed));
-            coroutines.Add(show_new_text("<color=#ffffff>Press Enter to continue...</color>"));
+            coroutines.Add(show_new_text("<color=#ffffff>Press Enter to continue...</color>", false));
             gameManager.ActivateWaitForEnterToEnd();
         }
         
@@ -307,6 +312,12 @@ public class TerminalController : MonoBehaviour
         ended = true;
     }
 
+    void PlayMessageSound()
+    {
+        audioSource.clip = messageSound;
+        audioSource.Play();
+    }
+
     void StartGame()
     {
         ShowNewText("sqlite3 Maze.db");
@@ -314,19 +325,20 @@ public class TerminalController : MonoBehaviour
         ShowRoomsLoading();
     }
 
-    public void ShowNewText(string text)
+    public void ShowNewText(string text, bool withSound = false)
     {
+        if(withSound) PlayMessageSound();
         Text gameNewText = InitObjectInContent(defaultText).GetComponentInChildren<Text>();
         gameNewText.text = text;
     }
 
-    public void ShowNewTextLoading(string text)
+    public void ShowNewTextLoading(string text, bool withSound = true)
     {
-        IEnumerator coroutine = show_new_text(text);
+        IEnumerator coroutine = show_new_text(text, withSound);
         StartCoroutine(coroutine);
     }
 
-    IEnumerator show_new_text(string text)
+    IEnumerator show_new_text(string text, bool withSound = true)
     {
         Text gameNewText = InitObjectInContent(defaultText).GetComponentInChildren<Text>();
         string startText = "Processing... {0}";
@@ -341,6 +353,7 @@ public class TerminalController : MonoBehaviour
         }
         is_loading       = false;
         gameNewText.text = text;
+        if(withSound) PlayMessageSound();
     }
 
     IDataReader GetRoomsSelectReader()

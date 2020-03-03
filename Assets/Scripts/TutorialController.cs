@@ -64,12 +64,12 @@ public class TutorialController : MonoBehaviour
     IEnumerator run_tutorial1()
     {
         ended_part = false;
-        terminal.ShowNewTextLoading("Started manual for <color=#ff5555>MONSTER-DESTROYER-PROGRAM</color>");
+        terminal.ShowNewTextLoading("Started manual for <color=#ff5555>MONSTER-DESTROYER-PROGRAM</color>", true);
         yield return new WaitForSeconds(pauseTime);
         terminal.ShowNewTextLoading("You're an AI that learned to <color=#ffff55>FIND</color> and <color=#ff5555>DESTROY</color> trash files");
         yield return new WaitForSeconds(waitTime);
         terminal.ShowNewText("");
-        terminal.ShowNewText("This files are <color=#ff5555>MONSTERS</color> of computers' data bases.");
+        terminal.ShowNewText("This files are <color=#ff5555>MONSTERS</color> of computers' data bases.", true);
         terminal.ShowNewText("Nobody, except <color=#fff>YOU</color>, can help people and their PCs");
         yield return new WaitForSeconds(waitTime);
         terminal.ShowNewText("");

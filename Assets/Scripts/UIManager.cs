@@ -34,6 +34,7 @@ public class UIManager : MonoBehaviour
     public GameObject[] inRoomCommands;
     public GameObject[] inFightCommands;
 
+
     public enum GameState {InMaze, InRoom, InFight, InMazeExit};
     public GameState currentState;
     GameState savedState;
@@ -221,6 +222,7 @@ public class UIManager : MonoBehaviour
         else
         {
             visual.PlayMonsterAttackAnimation();
+
             if(is_lower)
             {
                 terminal.ShowNewText("<color=#ff7777>The secrete is lower!</color>");
